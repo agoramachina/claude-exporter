@@ -105,10 +105,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                   conversationFilename = `${data.name || request.conversationId}.json`;
               }
 
-              zip.file(conversationFilename, conversationContent);
+              // Flat export: add to Chats folder
+              if (request.flattenArtifacts && !request.extractArtifacts) {
+                const chatsFolder = zip.folder('Chats');
+                chatsFolder.file(conversationFilename, conversationContent);
+              } else {
+                // Nested or no artifact extraction: add to root
+                zip.file(conversationFilename, conversationContent);
+              }
             }
 
-            // Add artifact files - nested and/or flat
+            // Add artifact files
             // Nested: create artifacts subfolder
             if (request.extractArtifacts) {
               const artifactsFolder = request.includeChats !== false ? zip.folder('artifacts') : zip;
@@ -117,11 +124,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
               }
             }
 
-            // Flat: add artifacts with conversation name prefix in same folder
-            if (request.flattenArtifacts) {
+            // Flat: add artifacts with conversation name prefix to Artifacts folder
+            if (request.flattenArtifacts && !request.extractArtifacts) {
+              const artifactsFolder = zip.folder('Artifacts');
               for (const artifact of artifactFiles) {
                 const filename = `${data.name || request.conversationId}_${artifact.filename}`;
-                zip.file(filename, artifact.content);
+                artifactsFolder.file(filename, artifact.content);
               }
             }
 
@@ -254,52 +262,50 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
               // Sanitize folder name
               const folderName = (conv.name || conv.uuid).replace(/[<>:"/\\|?*]/g, '_');
 
-              // Special case: ONLY flat artifacts (no chats, no nested) - dump all in root
-              if (request.flattenArtifacts && !request.extractArtifacts && request.includeChats === false) {
-                // Add artifacts directly to ZIP root with conversation name prefix
+              // Generate conversation content
+              let conversationContent, conversationFilename;
+              if (request.format === 'markdown') {
+                conversationContent = convertToMarkdown(fullConv, request.includeMetadata, conv.uuid, request.includeArtifacts, request.includeThinking);
+                conversationFilename = `${folderName}.md`;
+              } else if (request.format === 'text') {
+                conversationContent = convertToText(fullConv, request.includeMetadata, request.includeArtifacts, request.includeThinking);
+                conversationFilename = `${folderName}.txt`;
+              } else {
+                conversationContent = JSON.stringify(fullConv, null, 2);
+                conversationFilename = `${folderName}.json`;
+              }
+
+              // Flat export: use Chats and Artifacts top-level folders
+              if (request.flattenArtifacts && !request.extractArtifacts) {
+                // Add chat file to Chats folder if chats are enabled
+                if (request.includeChats !== false) {
+                  const chatsFolder = zip.folder('Chats');
+                  chatsFolder.file(conversationFilename, conversationContent);
+                }
+
+                // Add artifacts to Artifacts folder with conversation name prefix
                 if (artifactFiles.length > 0) {
+                  const artifactsFolder = zip.folder('Artifacts');
                   for (const artifact of artifactFiles) {
                     const artifactFilename = `${folderName}_${artifact.filename}`;
-                    zip.file(artifactFilename, artifact.content);
+                    artifactsFolder.file(artifactFilename, artifact.content);
                   }
                 }
-              } else {
-                // Create conversation folder for structured export
+              }
+              // Nested export: create per-conversation folders with artifacts subfolder
+              else if (request.extractArtifacts) {
                 const convFolder = zip.folder(folderName);
 
                 // Add conversation file only if includeChats is true
                 if (request.includeChats !== false) {
-                  let conversationContent, conversationFilename;
-                  if (request.format === 'markdown') {
-                    conversationContent = convertToMarkdown(fullConv, request.includeMetadata, conv.uuid, request.includeArtifacts, request.includeThinking);
-                    conversationFilename = `${folderName}.md`;
-                  } else if (request.format === 'text') {
-                    conversationContent = convertToText(fullConv, request.includeMetadata, request.includeArtifacts, request.includeThinking);
-                    conversationFilename = `${folderName}.txt`;
-                  } else {
-                    conversationContent = JSON.stringify(fullConv, null, 2);
-                    conversationFilename = `${folderName}.json`;
-                  }
-
                   convFolder.file(conversationFilename, conversationContent);
                 }
 
-                // Add artifact files - nested and/or flat
+                // Add artifact files in nested artifacts subfolder
                 if (artifactFiles.length > 0) {
-                  // Nested: create artifacts subfolder
-                  if (request.extractArtifacts) {
-                    const artifactsFolder = request.includeChats !== false ? convFolder.folder('artifacts') : convFolder;
-                    for (const artifact of artifactFiles) {
-                      artifactsFolder.file(artifact.filename, artifact.content);
-                    }
-                  }
-
-                  // Flat: add artifacts with conversation name prefix in same folder
-                  if (request.flattenArtifacts) {
-                    for (const artifact of artifactFiles) {
-                      const artifactFilename = `${folderName}_${artifact.filename}`;
-                      convFolder.file(artifactFilename, artifact.content);
-                    }
+                  const artifactsFolder = request.includeChats !== false ? convFolder.folder('artifacts') : convFolder;
+                  for (const artifact of artifactFiles) {
+                    artifactsFolder.file(artifact.filename, artifact.content);
                   }
                 }
               }
@@ -392,13 +398,63 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       })
       .catch(error => {
         console.error('Export all conversations error:', error);
-        sendResponse({ 
-          success: false, 
+        sendResponse({
+          success: false,
           error: error.message,
-          details: error.stack 
+          details: error.stack
         });
       });
-    
+
+    return true;
+  } else if (request.action === 'exportMemory') {
+    console.log('Export memory request received:', request);
+
+    fetchMemory(request.orgId, request.includeGlobal, request.includeProject)
+      .then(memory => {
+        console.log('Memory data fetched successfully:', memory);
+
+        if (!memory.global && !memory.project) {
+          sendResponse({
+            success: false,
+            error: 'No memory data found'
+          });
+          return;
+        }
+
+        let content, filename, type;
+        const now = new Date();
+        const datetime = now.toISOString().replace(/[:.]/g, '-').slice(0, 19).replace('T', '_');
+
+        switch (request.format) {
+          case 'markdown':
+            content = formatMemoryMarkdown(memory);
+            filename = `claude-memory-${datetime}.md`;
+            type = 'text/markdown';
+            break;
+          case 'text':
+            content = formatMemoryText(memory);
+            filename = `claude-memory-${datetime}.txt`;
+            type = 'text/plain';
+            break;
+          default:
+            content = JSON.stringify(memory, null, 2);
+            filename = `claude-memory-${datetime}.json`;
+            type = 'application/json';
+        }
+
+        console.log('Downloading memory file:', filename);
+        downloadFile(content, filename, type);
+        sendResponse({ success: true });
+      })
+      .catch(error => {
+        console.error('Memory export error:', error);
+        sendResponse({
+          success: false,
+          error: error.message,
+          details: error.stack
+        });
+      });
+
     return true;
   }
   });

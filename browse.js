@@ -595,10 +595,17 @@ async function exportConversation(conversationId, conversationName) {
               conversationFilename = `${conversationName || conversationId}.json`;
           }
 
-          zip.file(conversationFilename, conversationContent);
+          // Flat export: add to Chats folder
+          if (flattenArtifacts && !extractArtifacts) {
+            const chatsFolder = zip.folder('Chats');
+            chatsFolder.file(conversationFilename, conversationContent);
+          } else {
+            // Nested or no artifact extraction: add to root
+            zip.file(conversationFilename, conversationContent);
+          }
         }
 
-        // Add artifact files - nested and/or flat
+        // Add artifact files
         // Nested: create artifacts subfolder
         if (extractArtifacts) {
           const artifactsFolder = includeChats !== false ? zip.folder('artifacts') : zip;
@@ -607,11 +614,12 @@ async function exportConversation(conversationId, conversationName) {
           }
         }
 
-        // Flat: add artifacts with conversation name prefix in same folder
-        if (flattenArtifacts) {
+        // Flat: add artifacts with conversation name prefix to Artifacts folder
+        if (flattenArtifacts && !extractArtifacts) {
+          const artifactsFolder = zip.folder('Artifacts');
           for (const artifact of artifactFiles) {
             const filename = `${conversationName}_${artifact.filename}`;
-            zip.file(filename, artifact.content);
+            artifactsFolder.file(filename, artifact.content);
           }
         }
 
@@ -788,18 +796,25 @@ async function exportAllFiltered() {
               filename = `${safeName}.json`;
           }
 
-          // Special case: ONLY flat artifacts (no chats, no nested) - dump all in root
-          if (flattenArtifacts && !extractArtifacts && includeChats === false) {
-            // Add artifacts directly to ZIP root with conversation name prefix
+          // Flat export: use Chats and Artifacts top-level folders
+          if (flattenArtifacts && !extractArtifacts) {
+            // Add chat file to Chats folder if chats are enabled
+            if (includeChats !== false) {
+              const chatsFolder = zip.folder('Chats');
+              chatsFolder.file(filename, content);
+            }
+
+            // Add artifacts to Artifacts folder with conversation name prefix
             if (artifactFiles.length > 0) {
+              const artifactsFolder = zip.folder('Artifacts');
               for (const artifact of artifactFiles) {
                 const artifactFilename = `${safeName}_${artifact.filename}`;
-                zip.file(artifactFilename, artifact.content);
+                artifactsFolder.file(artifactFilename, artifact.content);
               }
             }
           }
-          // If extracting artifacts (nested or flat with other options), create folder structure
-          else if (extractArtifacts || flattenArtifacts) {
+          // Nested export: create per-conversation folders with artifacts subfolder
+          else if (extractArtifacts) {
             const convFolder = zip.folder(safeName);
 
             // Add conversation file only if includeChats is true
@@ -807,26 +822,15 @@ async function exportAllFiltered() {
               convFolder.file(filename, content);
             }
 
-            // Add artifact files - nested and/or flat
+            // Add artifact files in nested artifacts subfolder
             if (artifactFiles.length > 0) {
-              // Nested: create artifacts subfolder
-              if (extractArtifacts) {
-                const artifactsFolder = includeChats !== false ? convFolder.folder('artifacts') : convFolder;
-                for (const artifact of artifactFiles) {
-                  artifactsFolder.file(artifact.filename, artifact.content);
-                }
-              }
-
-              // Flat: add artifacts with conversation name prefix in same folder
-              if (flattenArtifacts) {
-                for (const artifact of artifactFiles) {
-                  const artifactFilename = `${safeName}_${artifact.filename}`;
-                  convFolder.file(artifactFilename, artifact.content);
-                }
+              const artifactsFolder = includeChats !== false ? convFolder.folder('artifacts') : convFolder;
+              for (const artifact of artifactFiles) {
+                artifactsFolder.file(artifact.filename, artifact.content);
               }
             }
           } else {
-            // Add file to ZIP root only if chats are enabled
+            // No artifact extraction - add file to ZIP root only if chats are enabled
             if (includeChats !== false) {
               zip.file(filename, content);
             }
@@ -908,6 +912,63 @@ async function exportAllFiltered() {
   }
 }
 
+// Export memory
+async function exportMemory() {
+  const format = document.getElementById('memoryFormat').value;
+  const includeGlobal = document.getElementById('includeGlobalMemory').checked;
+  const includeProject = document.getElementById('includeProjectMemory').checked;
+
+  if (!includeGlobal && !includeProject) {
+    showToast('Please select at least one memory type to export (Global or Project)', true);
+    return;
+  }
+
+  const button = document.getElementById('exportMemoryBtn');
+  button.disabled = true;
+  const originalButtonText = button.textContent;
+  button.textContent = 'Fetching...';
+
+  try {
+    const memory = await fetchMemory(orgId, includeGlobal, includeProject);
+
+    if (!memory.global && !memory.project) {
+      showToast('No memory data found', true);
+      return;
+    }
+
+    // Generate filename and content based on format
+    let content, filename;
+    const now = new Date();
+    const datetime = now.toISOString().replace(/[:.]/g, '-').slice(0, 19).replace('T', '_');
+
+    switch (format) {
+      case 'markdown':
+        content = formatMemoryMarkdown(memory);
+        filename = `claude-memory-${datetime}.md`;
+        break;
+      case 'text':
+        content = formatMemoryText(memory);
+        filename = `claude-memory-${datetime}.txt`;
+        break;
+      case 'json':
+        content = JSON.stringify(memory, null, 2);
+        filename = `claude-memory-${datetime}.json`;
+        break;
+    }
+
+    // Download the file
+    downloadFile(content, filename);
+    showToast('Memory exported successfully!');
+
+  } catch (error) {
+    console.error('Memory export error:', error);
+    showToast(`Export failed: ${error.message}`, true);
+  } finally {
+    button.disabled = false;
+    button.textContent = originalButtonText;
+  }
+}
+
 // Conversion functions are now imported from utils.js
 // Functions available: getCurrentBranch, convertToMarkdown, convertToText, downloadFile
 
@@ -980,4 +1041,7 @@ function setupEventListeners() {
 
   // Export all button
   document.getElementById('exportAllBtn').addEventListener('click', exportAllFiltered);
+
+  // Export Memory button
+  document.getElementById('exportMemoryBtn').addEventListener('click', exportMemory);
 }
