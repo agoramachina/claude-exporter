@@ -71,11 +71,16 @@ function inferModel(conversation) {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'exportConversation') {
     console.log('Export conversation request received:', request);
-    
+
     fetchConversation(request.orgId, request.conversationId)
       .then(data => {
         console.log('Conversation data fetched successfully:', data);
-        
+
+        // Validate conversation data structure
+        if (!data || !data.chat_messages || !Array.isArray(data.chat_messages)) {
+          throw new Error('Invalid conversation data structure. Please refresh the page and try again.');
+        }
+
         // Infer model if null
         data.model = inferModel(data);
         

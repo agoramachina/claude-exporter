@@ -104,6 +104,18 @@ If you still see old cached content:
 - Make sure you're on the correct page (claude.ai)
 - Try removing and reinstalling the extension completely
 
+### "downloadFile is not defined" error (Chrome/Firefox)
+If you see this error when trying to export the current conversation:
+1. **Refresh the Claude.ai page** (F5 or Ctrl+R)
+2. Try the export again
+3. This happens when the content script hasn't fully loaded on the conversation page yet
+
+### "can't access property Symbol.iterator" error (Firefox)
+If you see this error when exporting from a conversation page:
+1. Make sure you're on the actual conversation page (not the home page)
+2. Refresh the page and try again
+3. If the problem persists, use "Browse All Conversations" to export instead
+
 ## Differences Between Temporary and Permanent Installation
 
 | Feature | Temporary | Permanent (Unsigned) | AMO Published |
