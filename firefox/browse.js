@@ -1,3 +1,15 @@
+// Helper function to format datetime in local time for filenames
+function getLocalDateTimeString() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
+}
+
 // Theme management
 function initTheme() {
   // Check for saved theme preference or default to system preference
@@ -892,8 +904,7 @@ async function exportAllFiltered() {
     const a = document.createElement('a');
     a.href = url;
     // Format: claude-artifacts-2025-10-31_14-30-45.zip or claude-exports-2025-10-31_14-30-45.zip
-    const now = new Date();
-    const datetime = now.toISOString().replace(/[:.]/g, '-').slice(0, 19).replace('T', '_');
+    const datetime = getLocalDateTimeString();
     // Use 'claude-artifacts' when ONLY flat artifacts are exported
     const prefix = (flattenArtifacts && !extractArtifacts && includeChats === false) ? 'claude-artifacts' : 'claude-exports';
     a.download = `${prefix}-${datetime}.zip`;

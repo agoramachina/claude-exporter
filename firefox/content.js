@@ -11,6 +11,18 @@ const DEFAULT_MODEL_TIMELINE = [
   { date: new Date('2025-09-29'), model: 'claude-sonnet-4-5-20250929' } // Starting September 29, 2025
 ];
 
+// Helper function to format datetime in local time for filenames
+function getLocalDateTimeString() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
+}
+
 // Infer model for conversations with null model based on date
 function inferModel(conversation) {
   if (conversation.model) {
@@ -231,8 +243,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         if (request.format === 'json' && !request.extractArtifacts) {
           // For JSON without artifact extraction, export as a single file
           // Format: claude-exports-2025-10-31_14-30-45.json
-          const now = new Date();
-          const datetime = now.toISOString().replace(/[:.]/g, '-').slice(0, 19).replace('T', '_');
+          const datetime = getLocalDateTimeString();
           const filename = `claude-exports-${datetime}.json`;
           console.log('Downloading all conversations as JSON:', filename);
           downloadFile(JSON.stringify(conversations, null, 2), filename);
@@ -332,8 +343,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             const a = document.createElement('a');
             a.href = url;
             // Format: claude-artifacts-2025-10-31_14-30-45.zip or claude-exports-2025-10-31_14-30-45.zip
-            const now = new Date();
-            const datetime = now.toISOString().replace(/[:.]/g, '-').slice(0, 19).replace('T', '_');
+            const datetime = getLocalDateTimeString();
             // Use 'claude-artifacts' when ONLY flat artifacts are exported
             const prefix = (request.flattenArtifacts && !request.extractArtifacts && request.includeChats === false) ? 'claude-artifacts' : 'claude-exports';
             a.download = `${prefix}-${datetime}.zip`;
