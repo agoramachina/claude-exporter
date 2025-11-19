@@ -7,7 +7,7 @@ function getLocalDateTimeString() {
   const hours = String(now.getHours()).padStart(2, '0');
   const minutes = String(now.getMinutes()).padStart(2, '0');
   const seconds = String(now.getSeconds()).padStart(2, '0');
-  return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
+  return `${year}${month}${day}-${hours}${minutes}${seconds}`;
 }
 
 // Theme management
@@ -903,7 +903,7 @@ async function exportAllFiltered() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    // Format: claude-artifacts-2025-10-31_14-30-45.zip or claude-exports-2025-10-31_14-30-45.zip
+    // Format: claude-artifacts-20251031-143045.zip or claude-exports-20251031-143045.zip
     const datetime = getLocalDateTimeString();
     // Use 'claude-artifacts' when ONLY flat artifacts are exported
     const prefix = (flattenArtifacts && !extractArtifacts && includeChats === false) ? 'claude-artifacts' : 'claude-exports';

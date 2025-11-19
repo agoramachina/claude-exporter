@@ -20,7 +20,7 @@ function getLocalDateTimeString() {
   const hours = String(now.getHours()).padStart(2, '0');
   const minutes = String(now.getMinutes()).padStart(2, '0');
   const seconds = String(now.getSeconds()).padStart(2, '0');
-  return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
+  return `${year}${month}${day}-${hours}${minutes}${seconds}`;
 }
 
 // Infer model for conversations with null model based on date
@@ -242,7 +242,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         
         if (request.format === 'json' && !request.extractArtifacts) {
           // For JSON without artifact extraction, export as a single file
-          // Format: claude-exports-2025-10-31_14-30-45.json
+          // Format: claude-exports-20251031-143045.json
           const datetime = getLocalDateTimeString();
           const filename = `claude-exports-${datetime}.json`;
           console.log('Downloading all conversations as JSON:', filename);
@@ -342,7 +342,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            // Format: claude-artifacts-2025-10-31_14-30-45.zip or claude-exports-2025-10-31_14-30-45.zip
+            // Format: claude-artifacts-20251031-143045.zip or claude-exports-20251031-143045.zip
             const datetime = getLocalDateTimeString();
             // Use 'claude-artifacts' when ONLY flat artifacts are exported
             const prefix = (request.flattenArtifacts && !request.extractArtifacts && request.includeChats === false) ? 'claude-artifacts' : 'claude-exports';
