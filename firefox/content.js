@@ -1,35 +1,5 @@
-// Note: Organization ID is automatically detected from Claude.ai
-// Fallback to manual configuration if auto-detection fails
-
-// Automatically detect and store organization ID
-async function detectAndStoreOrgId() {
-  try {
-    // Try to fetch organizations to get the org ID
-    const response = await fetch('https://claude.ai/api/organizations', {
-      credentials: 'include',
-      headers: { 'Accept': 'application/json' }
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      // API might return an array of orgs or a single org object
-      if (Array.isArray(data) && data.length > 0) {
-        const orgId = data[0].uuid;
-        chrome.storage.sync.set({ organizationId: orgId });
-        console.log('Auto-detected organization ID:', orgId);
-      } else if (data.uuid) {
-        chrome.storage.sync.set({ organizationId: data.uuid });
-        console.log('Auto-detected organization ID:', data.uuid);
-      }
-    }
-  } catch (error) {
-    console.log('Could not auto-detect organization ID:', error);
-    // User will need to configure manually
-  }
-}
-
-// Run detection when content script loads
-detectAndStoreOrgId();
+// Note: Organization ID is now stored in extension settings
+// Users need to configure it in the extension options page
 
 // Default model timeline for null models
 const DEFAULT_MODEL_TIMELINE = [

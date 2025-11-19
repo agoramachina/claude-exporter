@@ -43,10 +43,14 @@ A browser extension for Chrome and Firefox that allows you to export your Claude
    - Select the `chrome` folder (inside the repository)
    - The extension icon should appear in your toolbar
 
-5. **Visit Claude.ai**
-   - Navigate to `https://claude.ai`
-   - The extension will automatically detect and store your Organization ID
-   - If auto-detection fails, you can manually configure it in the extension options
+5. **Configure Your Organization ID**
+   - Click the extension icon
+   - You'll see a notice about configuring your Organization ID
+   - Click "Click here to set it up" or right-click the extension icon → Options
+   - Go to `https://claude.ai/settings/account`
+   - Copy your Organization ID
+   - Paste it in the extension options and click Save
+   - Click "Test Connection" to verify it works
 
 ### Firefox Installation
 
@@ -65,10 +69,14 @@ A browser extension for Chrome and Firefox that allows you to export your Claude
    - Click "This Firefox" → "Load Temporary Add-on..."
    - Select the `manifest.json` file from the `firefox` folder
 
-3. **Visit Claude.ai** (same as Chrome)
-   - Navigate to `https://claude.ai`
-   - The extension will automatically detect and store your Organization ID
-   - If auto-detection fails, you can manually configure it in the extension options
+3. **Configure Your Organization ID** (same as Chrome)
+   - Click the extension icon
+   - You'll see a notice about configuring your Organization ID
+   - Click "Click here to set it up"
+   - Go to `https://claude.ai/settings/account`
+   - Copy your Organization ID
+   - Paste it in the extension options and click Save
+   - Click "Test Connection" to verify it works
 
 For permanent installation and Firefox-specific troubleshooting, see [FIREFOX_INSTALL.md](FIREFOX_INSTALL.md).
 
