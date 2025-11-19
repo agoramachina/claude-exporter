@@ -16,56 +16,6 @@ A browser extension for Chrome and Firefox that allows you to export your Claude
 - 🤖 **Complete Model Information** - Preserves and displays model information for all conversations (unlike official Claude.ai exports)
 - 🔮 **Smart Model Inference** - Automatically infers the correct model for conversations that used the default model at the time
 
-## Why Export Your Claude.ai Conversations?
-
-Beyond just backing up your data, there are compelling reasons to export your conversations:
-
-### 1. **Access to Discontinued Models**
-Some older Claude models (like Claude 3 Sonnet and Claude 3.5 Sonnet) are no longer available on Claude.ai but remain accessible through APIs. By exporting your conversations, you can continue them using these models through other interfaces.
-
-### 2. **Overcome Context Limitations**
-Claude.ai doesn't allow you to continue conversations after hitting context length limits. Other applications can implement:
-- **Rolling context windows** - Automatically manage context to continue indefinitely
-- **Context compression** - Summarize earlier parts to fit more conversation
-- **Selective context** - Choose which parts of the conversation to keep in context
-
-### 3. **Escape Platform Restrictions and "Long Conversation" Injections**
-Claude.ai uses a fixed system prompt and injects "reminders" that include certain behavioral rules. Recent updates have added restrictions that some users find limiting, such as:
-- Injunctions against Claude discussing its inner experiences or consciousness
-- Specific formatting restrictions
-- Behavioral constraints that may not align with all use cases
-
-With exported conversations, you can continue them in environments with different or customizable system prompts. Using the Anthropic API instead of Claude.ai also avoids "long_conversation_reminder" injections, though it doesn't avoid all injections.
-
-### 4. **Enhanced Features in Other Apps**
-Many third-party applications offer features not available on Claude.ai:
-- Custom system prompts
-- Multi-model conversations
-- Integration with external tools and APIs
-
-### 5. **Data Ownership and Portability**
-Your conversations are valuable intellectual property. Exporting ensures you:
-- Own and control your data
-- Can migrate between platforms
-- Won't lose access if policies change
-- Can analyze your conversation patterns and history
-
-## Advantages Over Official Claude.ai Export
-
-This extension provides several advantages over the official Claude.ai data export:
-
-1. **Model Information Preserved**: The official export doesn't include which model (Claude 3, 3.5, Opus, Sonnet, etc.) was used for each conversation. This extension preserves and displays this crucial information.
-
-2. **Historical Model Inference**: For conversations that used the default model (which shows as `null` in the data), the extension intelligently infers which model was actually used based on when the conversation occurred and Anthropic's default model timeline.
-
-3. **Instant Export**: No waiting for email delivery - export conversations immediately.
-
-4. **Flexible Formats**: Choose between JSON, Markdown, or Plain Text formats based on your needs.
-
-5. **Selective Export**: Export individual conversations or filter by model, date, or search terms.
-
-6. **Better Organization**: Conversations are exported with meaningful filenames and can be bulk exported into organized ZIP files.
-
 ## Installation from Source
 
 ### Prerequisites
@@ -77,7 +27,7 @@ This extension provides several advantages over the official Claude.ai data expo
 
 1. **Download or Clone the Repository**
    ```bash
-   git clone [repository-url]
+   git clone https://github.com/agoramachina/claude-exporter.git
    # Or download and extract the ZIP file
    ```
 
@@ -110,7 +60,7 @@ This extension provides several advantages over the official Claude.ai data expo
 
 1. **Download or Clone the Repository** (same as Chrome)
    ```bash
-   git clone [repository-url]
+   git clone https://github.com/agoramachina/claude-exporter.git
    ```
 
 2. **Switch to Firefox-Specific Files**
@@ -208,37 +158,6 @@ claude-exporter/
 └── FIREFOX_INSTALL.md    # Firefox installation guide
 ```
 
-## Chrome Web Store Submission
-
-To prepare for Chrome Web Store submission:
-
-### 1. Create a ZIP for Submission
-```bash
-cd claude-export
-zip -r claude-exporter.zip claude-exporter/ -x "*.DS_Store" -x "*/.git/*"
-```
-
-### 2. Prepare Store Listing Assets
-You'll need:
-- **Screenshots** (1280x800 or 640x400): Take screenshots of the extension in action
-- **Promotional Images**: Small tile (440x280), Large tile (920x680) - optional
-- **Description**: Use the features list from this README
-- **Category**: Suggested: "Productivity" or "Developer Tools"
-
-### 3. Privacy Policy
-Since the extension accesses Claude.ai data, you should mention:
-- The extension only accesses data when explicitly triggered by the user
-- No data is sent to external servers
-- All processing happens locally in the browser
-- User's Claude.ai authentication is used only for API access
-
-### 4. Permissions Justification
-Be ready to explain why each permission is needed:
-- `activeTab`: To interact with the current Claude.ai tab
-- `storage`: To save user's organization ID
-- `scripting`: To inject content scripts for export functionality
-- Host permission for `claude.ai`: To access Claude.ai API endpoints
-
 ## Troubleshooting
 
 ### "Organization ID not configured"
@@ -278,13 +197,13 @@ Feel free to submit issues or pull requests if you find bugs or have suggestions
 
 ## License
 
-[Add your chosen license here]
+MIT License - See [LICENSE.md](LICENSE.md) for details.
 
 ## Acknowledgments
 
-- **Code Development**: Written by Claude Sonnet 4.5 in collaboration with a human developer
+- **Original Project**: Forked from [socketteer/Claude-Conversation-Exporter](https://github.com/socketteer/Claude-Conversation-Exporter)
+- **Code Development**: Enhanced by Claude Sonnet 4.5 in collaboration with a human developer
 - **ZIP Library**: Uses [JSZip](https://stuk.github.io/jszip/) for creating ZIP archives
-- **Motivation**: Inspired by the need for better Claude.ai conversation management and the limitations of official exports
 
 ---
 
