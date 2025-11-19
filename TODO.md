@@ -60,7 +60,25 @@
     - Each artifact prefixed with conversation name
     - Filename: `claude-artifacts-{timestamp}.zip` (distinguishes from other exports)
 
+- **Automatic organization ID detection** (v1.8.0)
+  - Extension automatically detects and stores organization ID from Claude.ai
+  - Calls `/api/organizations` endpoint on page load
+  - No manual configuration required - just visit claude.ai/settings/account
+  - Fallback to manual configuration if auto-detection fails
+
+- **Firefox support** (v1.8.0)
+  - Complete Firefox-compatible version with Manifest V2
+  - Separate chrome/ and firefox/ folders with standalone extensions
+  - Auto-detection works in both browsers
+  - Updated installation guides for both platforms
+
 ## Pending 🔄
+
+- **Branch export options**
+  - Add option to export all branches vs. only current branch
+  - Currently markdown/text only export current branch, JSON exports all
+  - Let users choose their preference for all formats
+  - Useful for preserving alternate conversation paths
 
 - **Memory export**
   - Export Claude.ai memory (global and project-specific)
@@ -79,7 +97,7 @@
   - Need to better distinguish real artifacts from tool use results
   - Check for additional indicators beyond just `filename` field
 
-## Current Version: 1.7.0
+## Current Version: 1.8.0
 
 ## Notes
 
