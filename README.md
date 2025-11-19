@@ -111,7 +111,7 @@ For permanent installation and Firefox-specific troubleshooting, see [FIREFOX_IN
 
 ### Plain Text
 - Simple format following Claude's prompt style
-- Uses "Human:" and "Assistant:" prefixes
+- Uses "User:" and "Claude:" prefixes
 - Shows only the current conversation branch
 - Ideal for copying into other LLMs or text editors
 

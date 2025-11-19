@@ -55,7 +55,7 @@ function convertToMarkdown(data, includeMetadata, conversationId = null, include
   const branchMessages = getCurrentBranch(data);
 
   for (const message of branchMessages) {
-    const sender = message.sender === 'human' ? '## Prompt' : '### Response';
+    const sender = message.sender === 'human' ? '## User' : '## Claude';
     markdown += `${sender}\n`;
 
     if (includeMetadata && message.created_at) {
@@ -167,9 +167,9 @@ function convertToText(data, includeMetadata, includeArtifacts = true, includeTh
     // Use full label for all messages
     let senderLabel;
     if (message.sender === 'human') {
-      senderLabel = 'Human';
+      senderLabel = 'User';
     } else {
-      senderLabel = 'Assistant';
+      senderLabel = 'Claude';
     }
 
     // Add thinking text if present
