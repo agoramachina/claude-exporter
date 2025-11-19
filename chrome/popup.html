@@ -3,7 +3,27 @@
 <head>
   <meta charset="utf-8">
   <style>
+    /* Dark mode by default */
     :root {
+      --bg-color: #1e1e1e;
+      --text-color: #e0e0e0;
+      --border-color: #3a3a3a;
+      --primary-color: #6b52e8;
+      --primary-hover: #7d66f0;
+      --secondary-color: #32b34a;
+      --secondary-hover: #3cc752;
+      --disabled-bg: #3a3a3a;
+      --success-bg: #1a4d2e;
+      --success-text: #90ee90;
+      --error-bg: #4d1a1a;
+      --error-text: #ff9999;
+      --info-bg: #1a3d4d;
+      --info-text: #87ceeb;
+      --link-color: #8b7aff;
+    }
+
+    /* Light mode when system prefers light */
+    :root[data-theme="light"] {
       --bg-color: #ffffff;
       --text-color: #333333;
       --border-color: #dddddd;
@@ -21,26 +41,6 @@
       --link-color: #5436DA;
     }
 
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg-color: #1e1e1e;
-        --text-color: #e0e0e0;
-        --border-color: #3a3a3a;
-        --primary-color: #6b52e8;
-        --primary-hover: #7d66f0;
-        --secondary-color: #32b34a;
-        --secondary-hover: #3cc752;
-        --disabled-bg: #3a3a3a;
-        --success-bg: #1a4d2e;
-        --success-text: #90ee90;
-        --error-bg: #4d1a1a;
-        --error-text: #ff9999;
-        --info-bg: #1a3d4d;
-        --info-text: #87ceeb;
-        --link-color: #8b7aff;
-      }
-    }
-
     body {
       width: 350px;
       padding: 8px;
@@ -48,21 +48,24 @@
       margin: 0;
       background-color: var(--bg-color);
       color: var(--text-color);
+      min-height: 0;
+      max-height: 600px;
+      overflow-y: auto;
     }
     h2 {
       margin-top: 0;
       color: var(--text-color);
-      font-size: 18px;
+      font-size: 16px;
     }
     button {
       width: 100%;
-      padding: 10px;
-      margin: 5px 0;
+      padding: 8px;
+      margin: 4px 0;
       border: none;
-      border-radius: 5px;
+      border-radius: 4px;
       background: var(--primary-color);
       color: white;
-      font-size: 14px;
+      font-size: 13px;
       cursor: pointer;
       transition: background 0.2s;
     }
@@ -76,16 +79,16 @@
     }
     #browseConversations {
       background: var(--secondary-color);
-      margin-top: 10px;
+      margin-top: 6px;
     }
     #browseConversations:hover {
       background: var(--secondary-hover);
     }
     .status {
-      margin: 10px 0;
-      padding: 10px;
-      border-radius: 5px;
-      font-size: 13px;
+      margin: 6px 0;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 12px;
     }
     .success {
       background: var(--success-bg);
@@ -103,12 +106,12 @@
       color: var(--link-color);
     }
     .options {
-      margin: 15px 0;
+      margin: 8px 0;
     }
     label {
       display: block;
-      margin: 8px 0;
-      font-size: 13px;
+      margin: 6px 0;
+      font-size: 12px;
       color: var(--text-color);
     }
     input[type="checkbox"] {
@@ -116,21 +119,22 @@
     }
     select {
       width: 100%;
-      padding: 5px;
-      margin-top: 5px;
+      padding: 4px;
+      margin-top: 3px;
       border: 1px solid var(--border-color);
       border-radius: 3px;
       background-color: var(--bg-color);
       color: var(--text-color);
+      font-size: 12px;
     }
   </style>
 </head>
 <body>
-  <div style="margin: -8px -8px 15px -8px;">
+  <div style="margin: -8px -8px 8px -8px;">
     <img src="popup-header.png" alt="Claude Conversation Exporter" style="width: 100%; height: auto; display: block;">
   </div>
-  
-  <div style="padding: 0 7px;">
+
+  <div style="padding: 0 5px;">
     <div id="setupNotice" class="status info" style="display: none;">
       ⚠️ Organization ID not configured. 
       <a href="#" id="openOptions">Click here to set it up</a>
@@ -196,40 +200,60 @@
   <button id="exportCurrent">Export Current Conversation</button>
   <button id="exportAll">Export All Conversations</button>
 
-  <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-color);">
-    <h3 style="font-size: 14px; margin-bottom: 10px; color: var(--text-color);">Memory Export</h3>
-
-    <div class="options">
-      <div class="export-row">
-        <label>
-          Format:
-          <select id="memoryFormat">
-            <option value="json">JSON</option>
-            <option value="markdown">Markdown</option>
-            <option value="text">Plain Text</option>
-          </select>
-        </label>
-
-        <label title="Include global organizational memory">
-          <input type="checkbox" id="includeGlobalMemory" checked>
-          Global
-        </label>
-
-        <label title="Include project-specific memory">
-          <input type="checkbox" id="includeProjectMemory" checked>
-          Project
-        </label>
-      </div>
-    </div>
-
-    <button id="exportMemory">Export Memory</button>
-  </div>
-
   <button id="browseConversations">Browse All Conversations</button>
   
   <div id="status"></div>
   </div>
 
+  <script>
+    // Detect and apply theme preference (sync with browse window)
+    (function() {
+      // Check if user has set a theme in browse window (stored in localStorage)
+      const savedTheme = localStorage.getItem('theme');
+
+      if (savedTheme) {
+        // Use saved theme from browse window
+        if (savedTheme === 'light') {
+          document.documentElement.setAttribute('data-theme', 'light');
+        } else {
+          document.documentElement.removeAttribute('data-theme'); // dark
+        }
+      } else {
+        // Fall back to system preference
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+
+        // Default to dark unless system explicitly prefers light
+        if (prefersLight && !prefersDark) {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      }
+
+      // Listen for storage changes (when browse window changes theme)
+      window.addEventListener('storage', (e) => {
+        if (e.key === 'theme') {
+          if (e.newValue === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+          } else {
+            document.documentElement.removeAttribute('data-theme');
+          }
+        }
+      });
+
+      // Listen for system theme changes (only if no saved preference)
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!localStorage.getItem('theme') && e.matches) {
+          document.documentElement.removeAttribute('data-theme');
+        }
+      });
+
+      window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', (e) => {
+        if (!localStorage.getItem('theme') && e.matches) {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      });
+    })();
+  </script>
   <script src="utils.js"></script>
   <script src="popup.js"></script>
 </body>

@@ -11,6 +11,18 @@ const DEFAULT_MODEL_TIMELINE = [
   { date: new Date('2025-09-29'), model: 'claude-sonnet-4-5-20250929' } // Starting September 29, 2025
 ];
 
+// Helper function to format datetime in local time for filenames
+function getLocalDateTimeString() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  return `${year}${month}${day}-${hours}${minutes}${seconds}`;
+}
+
 // Infer model for conversations with null model based on date
 function inferModel(conversation) {
   if (conversation.model) {
@@ -71,11 +83,16 @@ function inferModel(conversation) {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'exportConversation') {
     console.log('Export conversation request received:', request);
-    
+
     fetchConversation(request.orgId, request.conversationId)
       .then(data => {
         console.log('Conversation data fetched successfully:', data);
-        
+
+        // Validate conversation data structure
+        if (!data || !data.chat_messages || !Array.isArray(data.chat_messages)) {
+          throw new Error('Invalid conversation data structure. Please refresh the page and try again.');
+        }
+
         // Infer model if null
         data.model = inferModel(data);
         
@@ -225,9 +242,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         
         if (request.format === 'json' && !request.extractArtifacts) {
           // For JSON without artifact extraction, export as a single file
-          // Format: claude-exports-2025-10-31_14-30-45.json
-          const now = new Date();
-          const datetime = now.toISOString().replace(/[:.]/g, '-').slice(0, 19).replace('T', '_');
+          // Format: claude-exports-20251031-143045.json
+          const datetime = getLocalDateTimeString();
           const filename = `claude-exports-${datetime}.json`;
           console.log('Downloading all conversations as JSON:', filename);
           downloadFile(JSON.stringify(conversations, null, 2), filename);
@@ -326,9 +342,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            // Format: claude-artifacts-2025-10-31_14-30-45.zip or claude-exports-2025-10-31_14-30-45.zip
-            const now = new Date();
-            const datetime = now.toISOString().replace(/[:.]/g, '-').slice(0, 19).replace('T', '_');
+            // Format: claude-artifacts-20251031-143045.zip or claude-exports-20251031-143045.zip
+            const datetime = getLocalDateTimeString();
             // Use 'claude-artifacts' when ONLY flat artifacts are exported
             const prefix = (request.flattenArtifacts && !request.extractArtifacts && request.includeChats === false) ? 'claude-artifacts' : 'claude-exports';
             a.download = `${prefix}-${datetime}.zip`;
@@ -406,52 +421,49 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       });
 
     return true;
-  } else if (request.action === 'exportMemory') {
-    console.log('Export memory request received:', request);
+  }
 
-    fetchMemory(request.orgId, request.includeGlobal, request.includeProject)
-      .then(memory => {
-        console.log('Memory data fetched successfully:', memory);
+  // Handle loadConversations request from browse page
+  if (request.action === 'loadConversations') {
+    console.log('Load conversations request received from browse page');
 
-        if (!memory.global && !memory.project) {
-          sendResponse({
-            success: false,
-            error: 'No memory data found'
-          });
-          return;
-        }
-
-        let content, filename, type;
-        const now = new Date();
-        const datetime = now.toISOString().replace(/[:.]/g, '-').slice(0, 19).replace('T', '_');
-
-        switch (request.format) {
-          case 'markdown':
-            content = formatMemoryMarkdown(memory);
-            filename = `claude-memory-${datetime}.md`;
-            type = 'text/markdown';
-            break;
-          case 'text':
-            content = formatMemoryText(memory);
-            filename = `claude-memory-${datetime}.txt`;
-            type = 'text/plain';
-            break;
-          default:
-            content = JSON.stringify(memory, null, 2);
-            filename = `claude-memory-${datetime}.json`;
-            type = 'application/json';
-        }
-
-        console.log('Downloading memory file:', filename);
-        downloadFile(content, filename, type);
-        sendResponse({ success: true });
+    fetchAllConversations(request.orgId)
+      .then(conversations => {
+        sendResponse({ success: true, conversations: conversations });
       })
       .catch(error => {
-        console.error('Memory export error:', error);
+        console.error('Load conversations error:', error);
         sendResponse({
           success: false,
-          error: error.message,
-          details: error.stack
+          error: error.message
+        });
+      });
+
+    return true;
+  }
+
+  // Handle loadProjects request from browse page
+  if (request.action === 'loadProjects') {
+    console.log('Load projects request received from browse page');
+
+    fetch(`https://claude.ai/api/organizations/${request.orgId}/projects`, {
+      credentials: 'include',
+      headers: { 'Accept': 'application/json' }
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(projects => {
+        sendResponse({ success: true, projects: projects });
+      })
+      .catch(error => {
+        console.error('Load projects error:', error);
+        sendResponse({
+          success: false,
+          error: error.message
         });
       });
 

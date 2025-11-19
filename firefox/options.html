@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Claude Exporter Settings</title>
+  <style>
+    :root {
+      --bg-body: #ffffff;
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --border-color: #dddddd;
+      --primary-color: #5436DA;
+      --primary-hover: #4329B8;
+      --section-bg: #f8f9fa;
+      --success-bg: #d4edda;
+      --success-text: #155724;
+      --error-bg: #f8d7da;
+      --error-text: #721c24;
+      --info-bg: #e8f4fd;
+      --code-bg: #ffffff;
+      --link-color: #5436DA;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-body: #1e1e1e;
+        --text-primary: #e0e0e0;
+        --text-secondary: #b0b0b0;
+        --border-color: #3a3a3a;
+        --primary-color: #6b52e8;
+        --primary-hover: #7d66f0;
+        --section-bg: #2a2a2a;
+        --success-bg: #1a4d2e;
+        --success-text: #90ee90;
+        --error-bg: #4d1a1a;
+        --error-text: #ff9999;
+        --info-bg: #1a3d4d;
+        --code-bg: #2a2a2a;
+        --link-color: #8b7aff;
+      }
+    }
+
+    body {
+      width: 600px;
+      margin: 40px auto;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: var(--text-primary);
+      background-color: var(--bg-body);
+    }
+    h1 {
+      color: var(--primary-color);
+      border-bottom: 2px solid var(--primary-color);
+      padding-bottom: 10px;
+    }
+    .section {
+      background: var(--section-bg);
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      font-size: 14px;
+      box-sizing: border-box;
+      background-color: var(--bg-body);
+      color: var(--text-primary);
+    }
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(107, 82, 232, 0.15);
+    }
+    button {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: var(--primary-hover);
+    }
+    .status {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      display: none;
+    }
+    .status.success {
+      display: block;
+      background: var(--success-bg);
+      color: var(--success-text);
+    }
+    .status.error {
+      display: block;
+      background: var(--error-bg);
+      color: var(--error-text);
+    }
+    .instructions {
+      background: var(--info-bg);
+      border-left: 4px solid var(--primary-color);
+      padding: 15px;
+      margin: 20px 0;
+    }
+    .instructions h3 {
+      margin-top: 0;
+      color: var(--primary-color);
+    }
+    .instructions ol {
+      margin-bottom: 0;
+      color: var(--text-primary);
+    }
+    .instructions a {
+      color: var(--link-color);
+    }
+    .instructions code {
+      background: var(--code-bg);
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      border: 1px solid var(--border-color);
+    }
+    .example {
+      color: var(--text-secondary);
+      font-size: 12px;
+      margin-top: 5px;
+      font-style: italic;
+    }
+    .section h3 {
+      color: var(--text-primary);
+    }
+    .section p {
+      color: var(--text-primary);
+    }
+  </style>
+</head>
+<body>
+  <h1>Claude Conversation Exporter Settings</h1>
+  
+  <div class="instructions">
+    <h3>How to find your Organization ID:</h3>
+    <ol>
+      <li>Go to <a href="https://claude.ai/settings/account" target="_blank">claude.ai/settings/account</a></li>
+      <li>Copy your Organization ID (e.g., <code>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</code>) </li>
+      <li>Paste it below and click Save</li>
+    </ol>
+  </div>
+
+  <div class="section">
+    <label for="orgId">Organization ID:</label>
+    <input type="text" id="orgId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+    <div class="example">This is a UUID that looks like: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</div>
+    <button id="saveBtn">Save Settings</button>
+    <div id="status" class="status"></div>
+  </div>
+
+  <div class="section">
+    <h3>Test Your Settings</h3>
+    <p>After saving your Organization ID, you can test if it works:</p>
+    <button id="testBtn">Test Connection</button>
+    <div id="testStatus" class="status"></div>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

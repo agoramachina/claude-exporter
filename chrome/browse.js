@@ -1,3 +1,15 @@
+// Helper function to format datetime in local time for filenames
+function getLocalDateTimeString() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  return `${year}${month}${day}-${hours}${minutes}${seconds}`;
+}
+
 // Theme management
 function initTheme() {
   // Check for saved theme preference or default to system preference
@@ -124,24 +136,42 @@ async function loadOrgId() {
   });
 }
 
-// Load projects from API
+// Helper function to find a claude.ai tab and send a message
+function sendMessageToClaudeTab(action, data) {
+  return new Promise((resolve, reject) => {
+    // Find a claude.ai tab using callback
+    chrome.tabs.query({ url: 'https://claude.ai/*' }, (tabs) => {
+      if (chrome.runtime.lastError) {
+        reject(new Error(chrome.runtime.lastError.message));
+        return;
+      }
+
+      if (!tabs || tabs.length === 0) {
+        reject(new Error('Please open a Claude.ai tab first to use this feature'));
+        return;
+      }
+
+      // Send message to the first claude.ai tab
+      chrome.tabs.sendMessage(tabs[0].id, { action, ...data }, (response) => {
+        if (chrome.runtime.lastError) {
+          reject(new Error(chrome.runtime.lastError.message));
+        } else if (response && response.success) {
+          resolve(response);
+        } else {
+          reject(new Error(response?.error || 'Request failed'));
+        }
+      });
+    });
+  });
+}
+
+// Load projects from API via content script
 async function loadProjects() {
   if (!orgId) return [];
 
   try {
-    const response = await fetch(`https://claude.ai/api/organizations/${orgId}/projects`, {
-      credentials: 'include',
-      headers: {
-        'Accept': 'application/json',
-      }
-    });
-
-    if (!response.ok) {
-      console.warn(`Failed to load projects: ${response.status}`);
-      return [];
-    }
-
-    const projects = await response.json();
+    const response = await sendMessageToClaudeTab('loadProjects', { orgId });
+    const projects = response.projects;
     console.log(`Loaded ${projects.length} projects:`, projects);
 
     // Store projects globally and build map
@@ -168,18 +198,8 @@ async function loadConversations() {
     // Load projects first
     const projects = await loadProjects();
 
-    const response = await fetch(`https://claude.ai/api/organizations/${orgId}/chat_conversations`, {
-      credentials: 'include',
-      headers: {
-        'Accept': 'application/json',
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to load conversations: ${response.status}`);
-    }
-
-    allConversations = await response.json();
+    const response = await sendMessageToClaudeTab('loadConversations', { orgId });
+    allConversations = response.conversations;
     console.log(`Loaded ${allConversations.length} conversations`);
 
     // Log first conversation to see structure
@@ -883,9 +903,8 @@ async function exportAllFiltered() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    // Format: claude-artifacts-2025-10-31_14-30-45.zip or claude-exports-2025-10-31_14-30-45.zip
-    const now = new Date();
-    const datetime = now.toISOString().replace(/[:.]/g, '-').slice(0, 19).replace('T', '_');
+    // Format: claude-artifacts-20251031-143045.zip or claude-exports-20251031-143045.zip
+    const datetime = getLocalDateTimeString();
     // Use 'claude-artifacts' when ONLY flat artifacts are exported
     const prefix = (flattenArtifacts && !extractArtifacts && includeChats === false) ? 'claude-artifacts' : 'claude-exports';
     a.download = `${prefix}-${datetime}.zip`;
@@ -905,63 +924,6 @@ async function exportAllFiltered() {
   } catch (error) {
     console.error('Export error:', error);
     progressModal.style.display = 'none';
-    showToast(`Export failed: ${error.message}`, true);
-  } finally {
-    button.disabled = false;
-    button.textContent = originalButtonText;
-  }
-}
-
-// Export memory
-async function exportMemory() {
-  const format = document.getElementById('memoryFormat').value;
-  const includeGlobal = document.getElementById('includeGlobalMemory').checked;
-  const includeProject = document.getElementById('includeProjectMemory').checked;
-
-  if (!includeGlobal && !includeProject) {
-    showToast('Please select at least one memory type to export (Global or Project)', true);
-    return;
-  }
-
-  const button = document.getElementById('exportMemoryBtn');
-  button.disabled = true;
-  const originalButtonText = button.textContent;
-  button.textContent = 'Fetching...';
-
-  try {
-    const memory = await fetchMemory(orgId, includeGlobal, includeProject);
-
-    if (!memory.global && !memory.project) {
-      showToast('No memory data found', true);
-      return;
-    }
-
-    // Generate filename and content based on format
-    let content, filename;
-    const now = new Date();
-    const datetime = now.toISOString().replace(/[:.]/g, '-').slice(0, 19).replace('T', '_');
-
-    switch (format) {
-      case 'markdown':
-        content = formatMemoryMarkdown(memory);
-        filename = `claude-memory-${datetime}.md`;
-        break;
-      case 'text':
-        content = formatMemoryText(memory);
-        filename = `claude-memory-${datetime}.txt`;
-        break;
-      case 'json':
-        content = JSON.stringify(memory, null, 2);
-        filename = `claude-memory-${datetime}.json`;
-        break;
-    }
-
-    // Download the file
-    downloadFile(content, filename);
-    showToast('Memory exported successfully!');
-
-  } catch (error) {
-    console.error('Memory export error:', error);
     showToast(`Export failed: ${error.message}`, true);
   } finally {
     button.disabled = false;
@@ -1041,7 +1003,4 @@ function setupEventListeners() {
 
   // Export all button
   document.getElementById('exportAllBtn').addEventListener('click', exportAllFiltered);
-
-  // Export Memory button
-  document.getElementById('exportMemoryBtn').addEventListener('click', exportMemory);
 }

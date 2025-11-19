@@ -1,0 +1,567 @@
+// Shared utility functions for Claude Exporter
+
+// Helper function to reconstruct the current branch from the message tree
+function getCurrentBranch(data) {
+  if (!data.chat_messages || !data.current_leaf_message_uuid) {
+    return [];
+  }
+  
+  // Create a map of UUID to message for quick lookup
+  const messageMap = new Map();
+  data.chat_messages.forEach(msg => {
+    messageMap.set(msg.uuid, msg);
+  });
+  
+  // Trace back from the current leaf to the root
+  const branch = [];
+  let currentUuid = data.current_leaf_message_uuid;
+  
+  while (currentUuid && messageMap.has(currentUuid)) {
+    const message = messageMap.get(currentUuid);
+    branch.unshift(message); // Add to beginning to maintain order
+    currentUuid = message.parent_message_uuid;
+    
+    // Stop if we hit the root (parent UUID that doesn't exist in our messages)
+    if (!messageMap.has(currentUuid)) {
+      break;
+    }
+  }
+  
+  return branch;
+}
+
+// Convert to markdown format
+function convertToMarkdown(data, includeMetadata, conversationId = null, includeArtifacts = true, includeThinking = true) {
+  console.log('🔧 convertToMarkdown - conversationId:', conversationId, 'includeArtifacts:', includeArtifacts, 'includeThinking:', includeThinking);
+  let markdown = `# ${data.name || 'Untitled Conversation'}\n\n`;
+
+  if (includeMetadata) {
+    markdown += `**Created:** ${new Date(data.created_at).toLocaleString()}\n`;
+    markdown += `**Updated:** ${new Date(data.updated_at).toLocaleString()}\n`;
+    markdown += `**Exported:** ${new Date().toLocaleString()}\n`;
+    markdown += `**Model:** ${data.model}\n`;
+    if (conversationId) {
+      markdown += `**Link:** [https://claude.ai/chat/${conversationId}](https://claude.ai/chat/${conversationId})\n`;
+    }
+    markdown += `\n---\n\n`;
+  }
+
+  // Get only the current branch messages
+  const branchMessages = getCurrentBranch(data);
+
+  for (const message of branchMessages) {
+    const sender = message.sender === 'human' ? '## User' : '## Claude';
+    markdown += `${sender}\n`;
+
+    if (includeMetadata && message.created_at) {
+      markdown += `**${new Date(message.created_at).toISOString()}**\n`;
+    }
+    markdown += `\n`;
+
+    // Extract artifacts from the entire message (handles both old and new formats)
+    const messageArtifacts = includeArtifacts ? extractArtifactsFromMessage(message) : [];
+    if (messageArtifacts.length > 0) {
+      console.log('📦 Found', messageArtifacts.length, 'artifact(s) in message:', messageArtifacts.map(a => a.title));
+    }
+
+    // Render message text (excluding tool_use and artifact tags)
+    if (message.content) {
+      for (const content of message.content) {
+        // Handle thinking blocks (extended thinking)
+        if (content.type === 'thinking' && content.thinking && includeThinking) {
+          // Get the summary if available
+          const summary = content.summaries && content.summaries.length > 0
+            ? content.summaries[content.summaries.length - 1].summary
+            : 'Thought process';
+
+          markdown += `#### Thinking\n\`\`\`\`plaintext\n${summary}\n\n${content.thinking}\n\`\`\`\`\n\n`;
+        }
+        // Handle regular text content (skip tool_use, we handle artifacts separately)
+        else if (content.type === 'text' && content.text) {
+          // Remove old-format artifact tags from text
+          let textWithoutArtifacts = content.text.replace(/<antArtifact[^>]*>[\s\S]*?<\/antArtifact>/g, '').trim();
+          if (textWithoutArtifacts) {
+            markdown += `${textWithoutArtifacts}\n\n`;
+          }
+        }
+      }
+    } else if (message.text) {
+      // Handle old format - remove artifact tags from text
+      let textWithoutArtifacts = message.text.replace(/<antArtifact[^>]*>[\s\S]*?<\/antArtifact>/g, '').trim();
+      if (textWithoutArtifacts) {
+        markdown += `${textWithoutArtifacts}\n\n`;
+      }
+    }
+
+    // Render all artifacts found in the message
+    for (const artifact of messageArtifacts) {
+      markdown += `#### 📦 Artifact: ${artifact.title}\n`;
+      markdown += `**Type:** ${artifact.type} | **Language:** ${artifact.language}\n\n`;
+
+      if (artifact.type === 'code' || isProgrammingLanguage(artifact.language)) {
+        markdown += `\`\`\`${artifact.language}\n${artifact.content}\n\`\`\`\n\n`;
+      } else {
+        markdown += `${artifact.content}\n\n`;
+      }
+    }
+  }
+
+  return markdown;
+}
+
+// Convert to plain text
+function convertToText(data, includeMetadata, includeArtifacts = true, includeThinking = true) {
+  let text = '';
+
+  // Add metadata header if requested
+  if (includeMetadata) {
+    text += `${data.name || 'Untitled Conversation'}\n`;
+    text += `Created: ${new Date(data.created_at).toLocaleString()}\n`;
+    text += `Updated: ${new Date(data.updated_at).toLocaleString()}\n`;
+    text += `Model: ${data.model}\n\n`;
+    text += '---\n\n';
+  }
+
+  // Get only the current branch messages
+  const branchMessages = getCurrentBranch(data);
+
+  branchMessages.forEach((message) => {
+    // Extract artifacts from the entire message (handles both old and new formats)
+    const artifacts = includeArtifacts ? extractArtifactsFromMessage(message) : [];
+
+    // Get the message text (excluding artifacts)
+    let messageText = '';
+    let thinkingText = '';
+    if (message.content) {
+      for (const content of message.content) {
+        // Handle thinking blocks
+        if (content.type === 'thinking' && content.thinking && includeThinking) {
+          const summary = content.summaries && content.summaries.length > 0
+            ? content.summaries[content.summaries.length - 1].summary
+            : 'Thought process';
+          thinkingText += `[Thinking: ${summary}]\n${content.thinking}\n[End Thinking]\n\n`;
+        }
+        // Only include text content, skip tool_use
+        else if (content.type === 'text' && content.text) {
+          // Remove old-format artifact tags
+          messageText += content.text.replace(/<antArtifact[^>]*>[\s\S]*?<\/antArtifact>/g, '').trim() + ' ';
+        }
+      }
+    } else if (message.text) {
+      // Handle old format - remove artifact tags
+      messageText = message.text.replace(/<antArtifact[^>]*>[\s\S]*?<\/antArtifact>/g, '').trim();
+    }
+
+    messageText = messageText.trim();
+
+    // Use full label for all messages
+    let senderLabel;
+    if (message.sender === 'human') {
+      senderLabel = 'User';
+    } else {
+      senderLabel = 'Claude';
+    }
+
+    // Add thinking text if present
+    if (thinkingText) {
+      text += thinkingText;
+    }
+
+    text += `${senderLabel}: ${messageText}\n`;
+
+    // Add artifacts if present
+    if (artifacts.length > 0) {
+      for (const artifact of artifacts) {
+        text += `\n[Artifact: ${artifact.title} (${artifact.language})]\n`;
+        text += `${artifact.content}\n`;
+        text += `[End Artifact]\n`;
+      }
+    }
+
+    text += `\n`;
+  });
+  
+  return text.trim();
+}
+
+// Download file utility
+function downloadFile(content, filename, type = 'application/json') {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ============================================================================
+// Artifact Extraction Functions
+// ============================================================================
+
+// Extract artifacts from message content (supports both old and new formats)
+function extractArtifactsFromMessage(message) {
+  const artifacts = [];
+
+  // Check if message has content array (new format)
+  if (message.content && Array.isArray(message.content)) {
+    for (const content of message.content) {
+      // NEW FORMAT: tool_use with display_content
+      if (content.type === 'tool_use' && content.display_content) {
+        const displayContent = content.display_content;
+
+        // Check for code_block format (newer artifact format)
+        if (displayContent.type === 'code_block' && displayContent.code) {
+          const language = displayContent.language || 'txt';
+          const code = displayContent.code || '';
+          const filename = displayContent.filename || 'artifact';
+
+          // Extract title from filename (remove path and extension)
+          const title = filename.split('/').pop().replace(/\.[^.]+$/, '');
+
+          artifacts.push({
+            title: title || 'Untitled',
+            language: language,
+            type: isProgrammingLanguage(language) ? 'code' : 'document',
+            identifier: null,
+            content: code.trim(),
+          });
+        }
+        // Check for json_block format (older artifact format)
+        else if (displayContent.type === 'json_block' && displayContent.json_block) {
+          try {
+            const artifactData = JSON.parse(displayContent.json_block);
+
+            // Only treat as artifact if it has a filename (real artifacts, not tool uses like bash)
+            if (artifactData.filename) {
+              // Extract artifact details
+              const language = artifactData.language || 'txt';
+              const code = artifactData.code || '';
+              const filename = artifactData.filename;
+
+              // Extract title from filename (remove path and extension)
+              const title = filename.split('/').pop().replace(/\.[^.]+$/, '');
+
+              artifacts.push({
+                title: title || 'Untitled',
+                language: language,
+                type: isProgrammingLanguage(language) ? 'code' : 'document',
+                identifier: null,
+                content: code.trim(),
+              });
+            }
+          } catch (e) {
+            // JSON parse failed, skip this artifact
+            console.warn('Failed to parse artifact json_block:', e);
+          }
+        }
+      }
+
+      // OLD FORMAT: Check text content for <antArtifact> tags
+      if (content.text) {
+        const textArtifacts = extractArtifactsFromText(content.text);
+        artifacts.push(...textArtifacts);
+      }
+    }
+  }
+
+  // Fallback: Check message.text directly (older format)
+  if (message.text) {
+    const textArtifacts = extractArtifactsFromText(message.text);
+    artifacts.push(...textArtifacts);
+  }
+
+  return artifacts;
+}
+
+// Extract artifacts from text using regex (OLD FORMAT: <antArtifact> tags)
+function extractArtifactsFromText(text) {
+  const artifactRegex = /<antArtifact[^>]*>([\s\S]*?)<\/antArtifact>/g;
+  const artifacts = [];
+  let match;
+
+  while ((match = artifactRegex.exec(text)) !== null) {
+    const fullTag = match[0];
+    const content = match[1];
+
+    // Extract attributes - handle both old and new formats
+    const titleMatch = fullTag.match(/title="([^"]*)"/);
+    const typeMatch = fullTag.match(/type="([^"]*)"/);
+    const languageMatch = fullTag.match(/language="([^"]*)"/);
+    const identifierMatch = fullTag.match(/identifier="([^"]*)"/);
+
+    // Determine the artifact type and language
+    let artifactType = 'text';
+    let language = 'txt';
+
+    if (typeMatch) {
+      const type = typeMatch[1];
+      // Map type to language/format
+      if (type === 'text/html') {
+        language = 'html';
+        artifactType = 'code';
+      } else if (type === 'text/markdown') {
+        language = 'markdown';
+        artifactType = 'document';
+      } else if (type === 'application/vnd.ant.code') {
+        language = languageMatch ? languageMatch[1] : 'txt';
+        artifactType = 'code';
+      } else if (type === 'text/css') {
+        language = 'css';
+        artifactType = 'code';
+      } else if (type === 'application/vnd.ant.mermaid') {
+        language = 'mermaid';
+        artifactType = 'document';
+      } else if (type === 'application/vnd.ant.react') {
+        language = 'jsx';
+        artifactType = 'code';
+      } else if (type === 'image/svg+xml') {
+        language = 'svg';
+        artifactType = 'code';
+      }
+    } else if (languageMatch) {
+      // Old format - just language attribute
+      language = languageMatch[1];
+      artifactType = 'code';
+    }
+
+    artifacts.push({
+      title: titleMatch ? titleMatch[1] : 'Untitled',
+      language: language,
+      type: artifactType,
+      identifier: identifierMatch ? identifierMatch[1] : null,
+      content: content.trim(),
+    });
+  }
+
+  return artifacts;
+}
+
+// Legacy function name for backward compatibility
+function extractArtifacts(text) {
+  return extractArtifactsFromText(text);
+}
+
+// Get file extension from language
+function getFileExtension(language) {
+  const languageToExt = {
+    javascript: '.js',
+    html: '.html',
+    css: '.css',
+    python: '.py',
+    java: '.java',
+    c: '.c',
+    cpp: '.cpp',
+    'c++': '.cpp',
+    ruby: '.rb',
+    php: '.php',
+    swift: '.swift',
+    go: '.go',
+    rust: '.rs',
+    typescript: '.ts',
+    tsx: '.tsx',
+    jsx: '.jsx',
+    shell: '.sh',
+    bash: '.sh',
+    sql: '.sql',
+    kotlin: '.kt',
+    scala: '.scala',
+    r: '.r',
+    matlab: '.m',
+    json: '.json',
+    xml: '.xml',
+    yaml: '.yaml',
+    yml: '.yml',
+    markdown: '.md',
+    md: '.md',
+    text: '.txt',
+    txt: '.txt',
+    latex: '.tex',
+    tex: '.tex',
+    bibtex: '.bib',
+    bib: '.bib',
+    mermaid: '.mmd',
+    svg: '.svg',
+    csv: '.csv',
+    toml: '.toml',
+    ini: '.ini',
+    perl: '.pl',
+    lua: '.lua',
+    dart: '.dart',
+    elixir: '.ex',
+    erlang: '.erl',
+    haskell: '.hs',
+    clojure: '.clj',
+    fsharp: '.fs',
+    'f#': '.fs',
+    'c#': '.cs',
+    csharp: '.cs',
+    'objective-c': '.m',
+    ocaml: '.ml',
+    scheme: '.scm',
+    lisp: '.lisp',
+    fortran: '.f90',
+    assembly: '.asm',
+    asm: '.asm',
+    scss: '.scss',
+    sass: '.sass',
+    less: '.less',
+    stylus: '.styl',
+    dockerfile: '.dockerfile',
+    makefile: '.mk',
+    gradle: '.gradle',
+    groovy: '.groovy',
+  };
+  return languageToExt[language.toLowerCase()] || '.txt';
+}
+
+// Check if a language is a programming language (should be saved in original format only)
+function isProgrammingLanguage(language) {
+  const programmingLanguages = [
+    'javascript', 'typescript', 'python', 'java', 'c', 'cpp', 'c++', 'ruby', 'php',
+    'swift', 'go', 'rust', 'jsx', 'tsx', 'shell', 'bash', 'sql', 'kotlin', 'scala',
+    'r', 'perl', 'lua', 'dart', 'elixir', 'erlang', 'haskell', 'clojure', 'fsharp',
+    'f#', 'c#', 'csharp', 'objective-c', 'ocaml', 'scheme', 'lisp', 'fortran',
+    'assembly', 'asm', 'groovy', 'html', 'css', 'scss', 'sass', 'less', 'stylus'
+  ];
+  return programmingLanguages.includes(language.toLowerCase());
+}
+
+// Convert artifact content and filename based on selected format
+function convertArtifactFormat(content, language, baseFilename, format) {
+  // Get original extension
+  const originalExtension = getFileExtension(language);
+
+  // Keep code files and non-markdown files in original format
+  if (isProgrammingLanguage(language) || originalExtension !== '.md') {
+    return {
+      filename: `${baseFilename}${originalExtension}`,
+      content: content
+    };
+  }
+
+  // For markdown documents, convert based on selected format
+  switch (format) {
+    case 'markdown':
+    case 'original':
+      // Keep as markdown
+      return {
+        filename: `${baseFilename}.md`,
+        content: content
+      };
+
+    case 'text':
+      // Convert to plain text (remove markdown formatting)
+      let plainText = content;
+
+      // Remove code blocks
+      plainText = plainText.replace(/```[\s\S]*?```/g, (match) => {
+        // Extract just the code content without backticks and language
+        return match.replace(/```\w*\n?/, '').replace(/\n?```$/, '');
+      });
+
+      // Remove inline code
+      plainText = plainText.replace(/`([^`]+)`/g, '$1');
+
+      // Remove bold/italic
+      plainText = plainText.replace(/\*\*([^*]+)\*\*/g, '$1');
+      plainText = plainText.replace(/\*([^*]+)\*/g, '$1');
+      plainText = plainText.replace(/__([^_]+)__/g, '$1');
+      plainText = plainText.replace(/_([^_]+)_/g, '$1');
+
+      // Remove headers (replace with just the text)
+      plainText = plainText.replace(/^#{1,6}\s+(.+)$/gm, '$1');
+
+      // Remove links but keep text
+      plainText = plainText.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1');
+
+      // Remove images
+      plainText = plainText.replace(/!\[([^\]]*)\]\([^\)]+\)/g, '');
+
+      // Remove horizontal rules
+      plainText = plainText.replace(/^[-*_]{3,}$/gm, '');
+
+      // Clean up excessive newlines
+      plainText = plainText.replace(/\n{3,}/g, '\n\n');
+
+      return {
+        filename: `${baseFilename}.txt`,
+        content: plainText.trim()
+      };
+
+    case 'json':
+      // Convert to JSON format
+      const jsonData = {
+        title: baseFilename,
+        language: language,
+        content: content,
+        format: 'markdown'
+      };
+
+      return {
+        filename: `${baseFilename}.json`,
+        content: JSON.stringify(jsonData, null, 2)
+      };
+
+    default:
+      // Default to original format
+      return {
+        filename: `${baseFilename}${originalExtension}`,
+        content: content
+      };
+  }
+}
+
+// Extract all artifacts from a conversation into separate files
+function extractArtifactFiles(data, artifactFormat = 'original') {
+  const artifactFiles = [];
+  const usedFilenames = new Set();
+
+  // Get only the current branch messages
+  const branchMessages = getCurrentBranch(data);
+
+  for (const message of branchMessages) {
+    const artifacts = extractArtifactsFromMessage(message);
+
+    for (const artifact of artifacts) {
+      // Generate filename from title and language
+      let baseFilename = artifact.title || 'artifact';
+      // Sanitize filename (remove invalid characters)
+      baseFilename = baseFilename.replace(/[<>:"/\\|?*]/g, '_');
+
+      // Convert artifact based on selected format
+      const converted = convertArtifactFormat(
+        artifact.content,
+        artifact.language,
+        baseFilename,
+        artifactFormat
+      );
+
+      let filename = converted.filename;
+
+      // Handle duplicate filenames
+      let counter = 1;
+      const extensionMatch = filename.match(/(\.[^.]+)$/);
+      const extension = extensionMatch ? extensionMatch[1] : '';
+      const nameWithoutExt = extension ? filename.slice(0, -extension.length) : filename;
+
+      while (usedFilenames.has(filename)) {
+        filename = `${nameWithoutExt}_${counter}${extension}`;
+        counter++;
+      }
+
+      usedFilenames.add(filename);
+
+      artifactFiles.push({
+        filename: filename,
+        content: converted.content
+      });
+    }
+  }
+
+  return artifactFiles;
+}
+// Functions are available globally in the browser context
+// No need for module.exports in browser extensions

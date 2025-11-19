@@ -60,14 +60,38 @@
     - Each artifact prefixed with conversation name
     - Filename: `claude-artifacts-{timestamp}.zip` (distinguishes from other exports)
 
+- **Firefox support** (v1.8.0)
+  - Complete Firefox-compatible version with Manifest V2
+  - Separate chrome/ and firefox/ folders with standalone extensions
+  - Updated installation guides for both platforms
+
 ## Pending 🔄
+
+- **Automatic organization ID detection**
+  - Auto-detect and store organization ID from Claude.ai
+  - Eliminate manual configuration step
+  - Fallback to manual configuration if auto-detection fails
+
+- **Branch export options**
+  - Add option to export all branches vs. only current branch
+  - Currently markdown/text only export current branch, JSON exports all
+  - Let users choose their preference for all formats
+  - Useful for preserving alternate conversation paths
+
+- **Claude Code export**
+  - Support exporting Claude Code conversations
+  - Handle code-specific content and artifacts
+
+- **PDF export for artifacts**
+  - Generate PDF versions of artifacts
+  - Useful for documentation and sharing
 
 - **Filter bash tool uses from artifact extraction**
   - Sometimes simple bash calls create artifact.sh files
   - Need to better distinguish real artifacts from tool use results
   - Check for additional indicators beyond just `filename` field
 
-## Current Version: 1.7.0
+## Current Version: 1.8.1
 
 ## Notes
 

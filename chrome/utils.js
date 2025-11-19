@@ -31,7 +31,7 @@ function getCurrentBranch(data) {
 }
 
 // Convert to markdown format
-function convertToMarkdown(data, includeMetadata, conversationId = null, includeArtifacts = true, includeThinking = true, memory = null) {
+function convertToMarkdown(data, includeMetadata, conversationId = null, includeArtifacts = true, includeThinking = true) {
   console.log('🔧 convertToMarkdown - conversationId:', conversationId, 'includeArtifacts:', includeArtifacts, 'includeThinking:', includeThinking);
   let markdown = `# ${data.name || 'Untitled Conversation'}\n\n`;
 
@@ -46,16 +46,11 @@ function convertToMarkdown(data, includeMetadata, conversationId = null, include
     markdown += `\n---\n\n`;
   }
 
-  // Include memory if provided
-  if (memory) {
-    markdown += formatMemoryMarkdown(memory);
-  }
-
   // Get only the current branch messages
   const branchMessages = getCurrentBranch(data);
 
   for (const message of branchMessages) {
-    const sender = message.sender === 'human' ? '## Prompt' : '### Response';
+    const sender = message.sender === 'human' ? '## User' : '## Claude';
     markdown += `${sender}\n`;
 
     if (includeMetadata && message.created_at) {
@@ -115,7 +110,7 @@ function convertToMarkdown(data, includeMetadata, conversationId = null, include
 }
 
 // Convert to plain text
-function convertToText(data, includeMetadata, includeArtifacts = true, includeThinking = true, memory = null) {
+function convertToText(data, includeMetadata, includeArtifacts = true, includeThinking = true) {
   let text = '';
 
   // Add metadata header if requested
@@ -127,17 +122,8 @@ function convertToText(data, includeMetadata, includeArtifacts = true, includeTh
     text += '---\n\n';
   }
 
-  // Include memory if provided
-  if (memory) {
-    text += formatMemoryText(memory);
-  }
-
   // Get only the current branch messages
   const branchMessages = getCurrentBranch(data);
-
-  // Use simplified format
-  let humanSeen = false;
-  let assistantSeen = false;
 
   branchMessages.forEach((message) => {
     // Extract artifacts from the entire message (handles both old and new formats)
@@ -168,14 +154,12 @@ function convertToText(data, includeMetadata, includeArtifacts = true, includeTh
 
     messageText = messageText.trim();
 
-    // Use full label on first occurrence, then abbreviate
+    // Use full label for all messages
     let senderLabel;
     if (message.sender === 'human') {
-      senderLabel = humanSeen ? 'H' : 'Human';
-      humanSeen = true;
+      senderLabel = 'User';
     } else {
-      senderLabel = assistantSeen ? 'A' : 'Assistant';
-      assistantSeen = true;
+      senderLabel = 'Claude';
     }
 
     // Add thinking text if present
@@ -579,120 +563,5 @@ function extractArtifactFiles(data, artifactFormat = 'original') {
 
   return artifactFiles;
 }
-
-// ============================================================================
-// Memory Functions
-// ============================================================================
-
-// Fetch memory data (global and project-specific) from Claude.ai
-async function fetchMemory(orgId, projectId = null) {
-  const memory = {
-    global: null,
-    project: null
-  };
-
-  try {
-    // Fetch global memory
-    const globalResponse = await fetch(
-      `https://claude.ai/api/organizations/${orgId}/memories`,
-      {
-        credentials: 'include',
-        headers: {
-          'Accept': 'application/json',
-        }
-      }
-    );
-
-    if (globalResponse.ok) {
-      memory.global = await globalResponse.json();
-      console.log('📝 Fetched global memory');
-    }
-  } catch (error) {
-    console.warn('Could not fetch global memory:', error);
-  }
-
-  // Fetch project-specific memory if projectId is provided
-  if (projectId) {
-    try {
-      const projectResponse = await fetch(
-        `https://claude.ai/api/organizations/${orgId}/projects/${projectId}/memories`,
-        {
-          credentials: 'include',
-          headers: {
-            'Accept': 'application/json',
-          }
-        }
-      );
-
-      if (projectResponse.ok) {
-        memory.project = await projectResponse.json();
-        console.log('📝 Fetched project memory');
-      }
-    } catch (error) {
-      console.warn('Could not fetch project memory:', error);
-    }
-  }
-
-  return memory;
-}
-
-// Format memory for markdown export
-function formatMemoryMarkdown(memory) {
-  if (!memory || (!memory.global && !memory.project)) {
-    return '';
-  }
-
-  let markdown = '## Memory\n\n';
-
-  // Global memory
-  if (memory.global && memory.global.length > 0) {
-    markdown += '### Global Memory\n\n';
-    memory.global.forEach((item, index) => {
-      markdown += `${index + 1}. ${item}\n`;
-    });
-    markdown += '\n';
-  }
-
-  // Project memory
-  if (memory.project && memory.project.length > 0) {
-    markdown += '### Project Memory\n\n';
-    memory.project.forEach((item, index) => {
-      markdown += `${index + 1}. ${item}\n`;
-    });
-    markdown += '\n';
-  }
-
-  return markdown;
-}
-
-// Format memory for plain text export
-function formatMemoryText(memory) {
-  if (!memory || (!memory.global && !memory.project)) {
-    return '';
-  }
-
-  let text = '\n--- Memory ---\n\n';
-
-  // Global memory
-  if (memory.global && memory.global.length > 0) {
-    text += 'Global Memory:\n';
-    memory.global.forEach((item, index) => {
-      text += `${index + 1}. ${item}\n`;
-    });
-    text += '\n';
-  }
-
-  // Project memory
-  if (memory.project && memory.project.length > 0) {
-    text += 'Project Memory:\n';
-    memory.project.forEach((item, index) => {
-      text += `${index + 1}. ${item}\n`;
-    });
-    text += '\n';
-  }
-
-  return text;
-}
-
 // Functions are available globally in the browser context
 // No need for module.exports in browser extensions
