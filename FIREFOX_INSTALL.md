@@ -85,44 +85,6 @@ All core functionality remains the same!
 - Make sure cookies are enabled for `about:addons`
 - Try using Firefox's private browsing mode to test
 
-## Publishing to Firefox Add-ons (AMO)
-
-If you want to publish this extension to the Firefox Add-ons marketplace:
-
-### 1. Create a Developer Account
-- Go to https://addons.mozilla.org/developers/
-- Create an account if you don't have one
-
-### 2. Update the Extension ID
-In `manifest_firefox.json`, update the extension ID:
-```json
-"browser_specific_settings": {
-  "gecko": {
-    "id": "your-unique-id@yourdomain.com",
-    "strict_min_version": "57.0"
-  }
-}
-```
-
-### 3. Package the Extension
-```bash
-cd claude-exporter
-zip -r claude-exporter-firefox.zip * \
-  -x "*.git/*" \
-  -x "*.DS_Store" \
-  -x "manifest_chrome.json" \
-  -x "background_chrome.js" \
-  -x "*.md"
-```
-
-### 4. Submit for Review
-1. Go to https://addons.mozilla.org/developers/addon/submit/
-2. Upload your ZIP file
-3. Fill in the required information
-4. Submit for review
-
-Mozilla's review process typically takes a few days to a few weeks.
-
 ## Differences Between Temporary and Permanent Installation
 
 | Feature | Temporary | Permanent (Unsigned) | AMO Published |
