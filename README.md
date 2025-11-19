@@ -1,6 +1,6 @@
 # Claude Exporter
 
-A Chrome extension that allows you to export your Claude.ai conversations and artifacts in various formats with support for bulk exports, artifact extraction, and conversation browsing.
+A browser extension for Chrome and Firefox that allows you to export your Claude.ai conversations and artifacts in various formats with support for bulk exports, artifact extraction, and conversation browsing.
 
 ## Features
 
@@ -69,10 +69,11 @@ This extension provides several advantages over the official Claude.ai data expo
 ## Installation from Source
 
 ### Prerequisites
-- Google Chrome browser (or Chromium-based browser)
+- **Chrome**: Google Chrome browser (or Chromium-based browser like Edge, Brave, etc.)
+- **Firefox**: Mozilla Firefox (version 57 or later)
 - A Claude.ai account
 
-### Steps
+### Chrome Installation
 
 1. **Download or Clone the Repository**
    ```bash
@@ -100,6 +101,42 @@ This extension provides several advantages over the official Claude.ai data expo
    - Copy your Organization ID
    - Paste it in the extension options and click Save
    - Click "Test Connection" to verify it works
+
+### Firefox Installation
+
+**🦊 Firefox users**: Please see the [Firefox Installation Guide](FIREFOX_INSTALL.md) for detailed Firefox-specific installation instructions.
+
+**Quick Firefox Setup:**
+
+1. **Download or Clone the Repository** (same as Chrome)
+   ```bash
+   git clone [repository-url]
+   ```
+
+2. **Switch to Firefox-Specific Files**
+
+   **Option A: Using the helper script (Linux/Mac)**
+   ```bash
+   cd claude-exporter
+   ./switch-to-firefox.sh
+   ```
+
+   **Option B: Manual copy**
+   ```bash
+   cd claude-exporter
+   cp manifest_firefox.json manifest.json
+   cp background_firefox.js background.js
+   ```
+
+3. **Load in Firefox**
+   - Navigate to `about:debugging`
+   - Click "This Firefox" → "Load Temporary Add-on..."
+   - Select the `manifest.json` file from the claude-exporter folder
+
+4. **Configure Your Organization ID** (same as Chrome)
+   - Follow step 5 from the Chrome installation above
+
+For permanent installation and Firefox-specific troubleshooting, see [FIREFOX_INSTALL.md](FIREFOX_INSTALL.md).
 
 ## Usage
 
@@ -148,8 +185,10 @@ This extension provides several advantages over the official Claude.ai data expo
 
 ```
 claude-exporter/
-├── manifest.json          # Extension configuration
-├── background.js          # Background service worker
+├── manifest.json          # Extension configuration (Chrome by default)
+├── manifest_firefox.json  # Firefox-specific manifest
+├── background.js          # Background service worker (Chrome)
+├── background_firefox.js  # Firefox-compatible background script
 ├── content.js            # Content script for Claude.ai pages
 ├── content.css           # Styles for content script
 ├── popup.html            # Extension popup interface
@@ -162,7 +201,11 @@ claude-exporter/
 ├── jszip.min.js          # Library for creating ZIP files
 ├── icon16.png            # Extension icon (16x16)
 ├── icon48.png            # Extension icon (48x48)
-└── icon128.png           # Extension icon (128x128)
+├── icon128.png           # Extension icon (128x128)
+├── switch-to-firefox.sh  # Helper script to switch to Firefox version
+├── switch-to-chrome.sh   # Helper script to switch to Chrome version
+├── README.md             # This file
+└── FIREFOX_INSTALL.md    # Firefox installation guide
 ```
 
 ## Chrome Web Store Submission
