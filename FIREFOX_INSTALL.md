@@ -44,15 +44,12 @@ For development and testing, you can:
 
 **Note**: Setting `xpinstall.signatures.required` to `false` is only recommended for development. For regular use, temporary installation is safer.
 
-### 3. Configure Your Organization ID
+### 3. Visit Claude.ai
 
-1. Click the extension icon in the Firefox toolbar
-2. You'll see a notice about configuring your Organization ID
-3. Click "Click here to set it up"
-4. Go to `https://claude.ai/settings/account`
-5. Copy your Organization ID from the URL (it looks like `organization_id=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`)
-6. Paste it in the extension options and click Save
-7. Click "Test Connection" to verify it works
+1. Navigate to `https://claude.ai` and log in
+2. The extension will automatically detect and store your Organization ID
+3. You can verify it's working by clicking the extension icon
+4. If auto-detection fails, you can manually configure it in the extension options (right-click the icon → Options)
 
 ## Differences from Chrome Version
 
