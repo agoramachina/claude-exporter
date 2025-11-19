@@ -22,6 +22,27 @@
       --link-color: #8b7aff;
     }
 
+    /* Light mode when explicitly chosen */
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg-color: #ffffff;
+        --text-color: #333333;
+        --border-color: #dddddd;
+        --primary-color: #5436DA;
+        --primary-hover: #4329B8;
+        --secondary-color: #28a745;
+        --secondary-hover: #218838;
+        --disabled-bg: #cccccc;
+        --success-bg: #d4edda;
+        --success-text: #155724;
+        --error-bg: #f8d7da;
+        --error-text: #721c24;
+        --info-bg: #d1ecf1;
+        --info-text: #0c5460;
+        --link-color: #5436DA;
+      }
+    }
+
     body {
       width: 350px;
       padding: 8px;
