@@ -44,9 +44,9 @@ For development and testing, you can:
 
 **Note**: Setting `xpinstall.signatures.required` to `false` is only recommended for development. For regular use, temporary installation is safer.
 
-### 3. Visit Claude.ai Settings
+### 3. Visit Claude.ai
 
-1. Navigate to `https://claude.ai/settings/account` (make sure you're logged in)
+1. Navigate to `https://claude.ai` and log in
 2. The extension will automatically detect and store your Organization ID
 3. You can verify it's working by clicking the extension icon
 4. If auto-detection fails, you can manually configure it in the extension options (right-click the icon → Options)
