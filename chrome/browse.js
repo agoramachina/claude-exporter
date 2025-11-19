@@ -125,24 +125,30 @@ async function loadOrgId() {
 }
 
 // Helper function to find a claude.ai tab and send a message
-async function sendMessageToClaudeTab(action, data) {
-  // Find a claude.ai tab
-  const tabs = await chrome.tabs.query({ url: 'https://claude.ai/*' });
-
-  if (tabs.length === 0) {
-    throw new Error('Please open a Claude.ai tab first to use this feature');
-  }
-
-  // Send message to the first claude.ai tab
+function sendMessageToClaudeTab(action, data) {
   return new Promise((resolve, reject) => {
-    chrome.tabs.sendMessage(tabs[0].id, { action, ...data }, (response) => {
+    // Find a claude.ai tab using callback
+    chrome.tabs.query({ url: 'https://claude.ai/*' }, (tabs) => {
       if (chrome.runtime.lastError) {
         reject(new Error(chrome.runtime.lastError.message));
-      } else if (response && response.success) {
-        resolve(response);
-      } else {
-        reject(new Error(response?.error || 'Request failed'));
+        return;
       }
+
+      if (!tabs || tabs.length === 0) {
+        reject(new Error('Please open a Claude.ai tab first to use this feature'));
+        return;
+      }
+
+      // Send message to the first claude.ai tab
+      chrome.tabs.sendMessage(tabs[0].id, { action, ...data }, (response) => {
+        if (chrome.runtime.lastError) {
+          reject(new Error(chrome.runtime.lastError.message));
+        } else if (response && response.success) {
+          resolve(response);
+        } else {
+          reject(new Error(response?.error || 'Request failed'));
+        }
+      });
     });
   });
 }

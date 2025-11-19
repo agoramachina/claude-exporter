@@ -6,6 +6,7 @@
   "permissions": [
     "activeTab",
     "storage",
+    "tabs",
     "https://claude.ai/*"
   ],
   "browser_action": {
