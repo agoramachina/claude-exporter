@@ -9,7 +9,11 @@ chrome.runtime.onInstalled.addListener(() => {
     tabs.forEach(tab => {
       chrome.tabs.executeScript(tab.id, {
         file: 'content.js'
-      }).catch(err => console.log('Could not inject into tab', tab.id, err));
+      }, () => {
+        if (chrome.runtime.lastError) {
+          console.log('Could not inject into tab', tab.id, chrome.runtime.lastError.message);
+        }
+      });
     });
   });
 });
