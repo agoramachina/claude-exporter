@@ -11,41 +11,18 @@ This guide explains how to install Claude Exporter in Mozilla Firefox.
 ### 1. Download or Clone the Repository
 
 ```bash
-git clone [repository-url]
-# Or download and extract the ZIP file
-```
-
-### 2. Prepare Firefox-Specific Files
-
-The extension includes Firefox-specific versions of some files. You need to swap these in:
-
-```bash
+git clone https://github.com/agoramachina/claude-exporter.git
 cd claude-exporter
-
-# Backup the Chrome manifest (optional)
-cp manifest.json manifest_chrome.json
-
-# Use the Firefox manifest
-cp manifest_firefox.json manifest.json
-
-# Use the Firefox background script
-cp background_firefox.js background.js
 ```
 
-Alternatively, you can manually:
-- Rename `manifest.json` to `manifest_chrome.json`
-- Rename `manifest_firefox.json` to `manifest.json`
-- Rename `background.js` to `background_chrome.js`
-- Rename `background_firefox.js` to `background.js`
-
-### 3. Load the Extension in Firefox
+### 2. Load the Extension in Firefox
 
 #### Option A: Temporary Installation (For Testing)
 
 1. Open Firefox and navigate to `about:debugging`
 2. Click "This Firefox" in the left sidebar
 3. Click "Load Temporary Add-on..."
-4. Navigate to the `claude-exporter` folder
+4. Navigate to the `firefox` folder (inside the repository)
 5. Select the `manifest.json` file
 6. The extension will be loaded temporarily (until you restart Firefox)
 
@@ -58,7 +35,7 @@ For development and testing, you can:
 3. Set it to `false` (this allows unsigned extensions)
 4. Package the extension:
    ```bash
-   cd claude-exporter
+   cd firefox
    zip -r ../claude-exporter-firefox.zip *
    ```
 5. Go to `about:addons`
@@ -67,7 +44,7 @@ For development and testing, you can:
 
 **Note**: Setting `xpinstall.signatures.required` to `false` is only recommended for development. For regular use, temporary installation is safer.
 
-### 4. Configure Your Organization ID
+### 3. Configure Your Organization ID
 
 1. Click the extension icon in the Firefox toolbar
 2. You'll see a notice about configuring your Organization ID
@@ -156,19 +133,13 @@ Mozilla's review process typically takes a few days to a few weeks.
 | Easy to install | ✅ | ⚠️ | ✅ |
 | Recommended for | Testing | Development | Production |
 
-## Switching Back to Chrome
+## Using Both Browsers
 
-To use the Chrome version again:
+The repository includes separate folders for Chrome and Firefox, so you can easily use both:
+- Use the `chrome/` folder for Chrome installation
+- Use the `firefox/` folder for Firefox installation
 
-```bash
-# Restore the Chrome manifest
-cp manifest_chrome.json manifest.json
-
-# Restore the Chrome background script (if you backed it up)
-# The original background.js works with Chrome
-```
-
-Or just clone a fresh copy of the repository.
+Both folders are complete, standalone extensions with no need to switch files!
 
 ## Additional Resources
 
@@ -180,7 +151,7 @@ Or just clone a fresh copy of the repository.
 
 If you encounter issues specific to Firefox, please:
 1. Check the Browser Console (Ctrl+Shift+J) for errors
-2. Verify you're using the Firefox-specific files (`manifest_firefox.json` → `manifest.json`)
+2. Verify you're loading from the `firefox/` folder
 3. Make sure your Firefox version is 57 or later
 4. Open an issue on the repository with "Firefox:" in the title
 

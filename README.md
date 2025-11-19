@@ -28,7 +28,7 @@ A browser extension for Chrome and Firefox that allows you to export your Claude
 1. **Download or Clone the Repository**
    ```bash
    git clone https://github.com/agoramachina/claude-exporter.git
-   # Or download and extract the ZIP file
+   cd claude-exporter
    ```
 
 2. **Open Chrome Extensions Page**
@@ -40,7 +40,7 @@ A browser extension for Chrome and Firefox that allows you to export your Claude
 
 4. **Load the Extension**
    - Click "Load unpacked"
-   - Select the `claude-exporter` folder
+   - Select the `chrome` folder (inside the repository)
    - The extension icon should appear in your toolbar
 
 5. **Configure Your Organization ID**
@@ -58,33 +58,25 @@ A browser extension for Chrome and Firefox that allows you to export your Claude
 
 **Quick Firefox Setup:**
 
-1. **Download or Clone the Repository** (same as Chrome)
+1. **Download or Clone the Repository**
    ```bash
    git clone https://github.com/agoramachina/claude-exporter.git
-   ```
-
-2. **Switch to Firefox-Specific Files**
-
-   **Option A: Using the helper script (Linux/Mac)**
-   ```bash
    cd claude-exporter
-   ./switch-to-firefox.sh
    ```
 
-   **Option B: Manual copy**
-   ```bash
-   cd claude-exporter
-   cp manifest_firefox.json manifest.json
-   cp background_firefox.js background.js
-   ```
-
-3. **Load in Firefox**
+2. **Load in Firefox**
    - Navigate to `about:debugging`
    - Click "This Firefox" → "Load Temporary Add-on..."
-   - Select the `manifest.json` file from the claude-exporter folder
+   - Select the `manifest.json` file from the `firefox` folder
 
-4. **Configure Your Organization ID** (same as Chrome)
-   - Follow step 5 from the Chrome installation above
+3. **Configure Your Organization ID** (same as Chrome)
+   - Click the extension icon
+   - You'll see a notice about configuring your Organization ID
+   - Click "Click here to set it up"
+   - Go to `https://claude.ai/settings/account`
+   - Copy your Organization ID
+   - Paste it in the extension options and click Save
+   - Click "Test Connection" to verify it works
 
 For permanent installation and Firefox-specific troubleshooting, see [FIREFOX_INSTALL.md](FIREFOX_INSTALL.md).
 
@@ -127,7 +119,7 @@ For permanent installation and Firefox-specific troubleshooting, see [FIREFOX_IN
 
 ### Plain Text
 - Simple format following Claude's prompt style
-- Uses "Human:" and "Assistant:" prefixes (abbreviated to H:/A: after first occurrence)
+- Uses "Human:" and "Assistant:" prefixes
 - Shows only the current conversation branch
 - Ideal for copying into other LLMs or text editors
 
@@ -135,27 +127,37 @@ For permanent installation and Firefox-specific troubleshooting, see [FIREFOX_IN
 
 ```
 claude-exporter/
-├── manifest.json          # Extension configuration (Chrome by default)
-├── manifest_firefox.json  # Firefox-specific manifest
-├── background.js          # Background service worker (Chrome)
-├── background_firefox.js  # Firefox-compatible background script
-├── content.js            # Content script for Claude.ai pages
-├── content.css           # Styles for content script
-├── popup.html            # Extension popup interface
-├── popup.js              # Popup functionality
-├── options.html          # Options page for configuration
-├── options.js            # Options page logic
-├── browse.html           # Conversation browser interface
-├── browse.js             # Browser page functionality
-├── utils.js              # Shared utility functions
-├── jszip.min.js          # Library for creating ZIP files
-├── icon16.png            # Extension icon (16x16)
-├── icon48.png            # Extension icon (48x48)
-├── icon128.png           # Extension icon (128x128)
-├── switch-to-firefox.sh  # Helper script to switch to Firefox version
-├── switch-to-chrome.sh   # Helper script to switch to Chrome version
+├── chrome/               # Chrome extension (complete, ready to load)
+│   ├── manifest.json     # Chrome manifest (Manifest V3)
+│   ├── background.js     # Background service worker
+│   ├── content.js        # Content script for Claude.ai pages
+│   ├── content.css       # Styles for content script
+│   ├── popup.html        # Extension popup interface
+│   ├── popup.js          # Popup functionality
+│   ├── options.html      # Options page for configuration
+│   ├── options.js        # Options page logic
+│   ├── browse.html       # Conversation browser interface
+│   ├── browse.js         # Browser page functionality
+│   ├── utils.js          # Shared utility functions
+│   ├── jszip.min.js      # Library for creating ZIP files
+│   └── icons...          # Extension icons
+├── firefox/              # Firefox extension (complete, ready to load)
+│   ├── manifest.json     # Firefox manifest (Manifest V2)
+│   ├── background.js     # Firefox-compatible background script
+│   ├── content.js        # Content script for Claude.ai pages
+│   ├── content.css       # Styles for content script
+│   ├── popup.html        # Extension popup interface
+│   ├── popup.js          # Popup functionality
+│   ├── options.html      # Options page for configuration
+│   ├── options.js        # Options page logic
+│   ├── browse.html       # Conversation browser interface
+│   ├── browse.js         # Browser page functionality
+│   ├── utils.js          # Shared utility functions
+│   ├── jszip.min.js      # Library for creating ZIP files
+│   └── icons...          # Extension icons
 ├── README.md             # This file
-└── FIREFOX_INSTALL.md    # Firefox installation guide
+├── FIREFOX_INSTALL.md    # Firefox installation guide
+└── LICENSE.md            # MIT License
 ```
 
 ## Troubleshooting

@@ -135,10 +135,6 @@ function convertToText(data, includeMetadata, includeArtifacts = true, includeTh
   // Get only the current branch messages
   const branchMessages = getCurrentBranch(data);
 
-  // Use simplified format
-  let humanSeen = false;
-  let assistantSeen = false;
-
   branchMessages.forEach((message) => {
     // Extract artifacts from the entire message (handles both old and new formats)
     const artifacts = includeArtifacts ? extractArtifactsFromMessage(message) : [];
@@ -168,14 +164,12 @@ function convertToText(data, includeMetadata, includeArtifacts = true, includeTh
 
     messageText = messageText.trim();
 
-    // Use full label on first occurrence, then abbreviate
+    // Use full label for all messages
     let senderLabel;
     if (message.sender === 'human') {
-      senderLabel = humanSeen ? 'H' : 'Human';
-      humanSeen = true;
+      senderLabel = 'Human';
     } else {
-      senderLabel = assistantSeen ? 'A' : 'Assistant';
-      assistantSeen = true;
+      senderLabel = 'Assistant';
     }
 
     // Add thinking text if present
