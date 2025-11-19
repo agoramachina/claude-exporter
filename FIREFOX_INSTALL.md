@@ -85,6 +85,25 @@ All core functionality remains the same!
 - Make sure cookies are enabled for `about:addons`
 - Try using Firefox's private browsing mode to test
 
+### Extension showing old UI or features after update
+Firefox aggressively caches extension files. To force a reload:
+1. Go to `about:debugging#/runtime/this-firefox`
+2. Find "Claude Exporter" and click **Remove**
+3. Close ALL Firefox windows completely
+4. Restart Firefox and reload the extension
+5. Alternatively, hard-refresh (Ctrl+Shift+R) on Claude.ai after reloading
+
+If you still see old cached content:
+- Clear Firefox cache: `Ctrl+Shift+Delete` → Check "Cache" → Clear Now
+- Reload the extension from `about:debugging`
+- Refresh Claude.ai page
+
+### Exports not working
+- Check Browser Console (Ctrl+Shift+J) for errors
+- Verify Organization ID is configured in extension options
+- Make sure you're on the correct page (claude.ai)
+- Try removing and reinstalling the extension completely
+
 ## Differences Between Temporary and Permanent Installation
 
 | Feature | Temporary | Permanent (Unsigned) | AMO Published |
