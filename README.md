@@ -208,7 +208,7 @@ MIT License - See [LICENSE.md](LICENSE.md) for details.
 ## Acknowledgments
 
 - **Original Project**: Forked from [socketteer/Claude-Conversation-Exporter](https://github.com/socketteer/Claude-Conversation-Exporter)
-- **Code Development**: Enhanced by Claude Sonnet 4.5 in collaboration with a human developer
+- **Code Development**: Written in collaboration with Claude Sonnet 4.5
 - **ZIP Library**: Uses [JSZip](https://stuk.github.io/jszip/) for creating ZIP archives
 
 ---
