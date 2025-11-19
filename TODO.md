@@ -67,6 +67,11 @@
 
 ## Pending 🔄
 
+- **Automatic organization ID detection**
+  - Auto-detect and store organization ID from Claude.ai
+  - Eliminate manual configuration step
+  - Fallback to manual configuration if auto-detection fails
+
 - **Branch export options**
   - Add option to export all branches vs. only current branch
   - Currently markdown/text only export current branch, JSON exports all
