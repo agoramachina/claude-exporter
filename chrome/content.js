@@ -407,4 +407,51 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     return true;
   }
+
+  // Handle loadConversations request from browse page
+  if (request.action === 'loadConversations') {
+    console.log('Load conversations request received from browse page');
+
+    fetchAllConversations(request.orgId)
+      .then(conversations => {
+        sendResponse({ success: true, conversations: conversations });
+      })
+      .catch(error => {
+        console.error('Load conversations error:', error);
+        sendResponse({
+          success: false,
+          error: error.message
+        });
+      });
+
+    return true;
+  }
+
+  // Handle loadProjects request from browse page
+  if (request.action === 'loadProjects') {
+    console.log('Load projects request received from browse page');
+
+    fetch(`https://claude.ai/api/organizations/${request.orgId}/projects`, {
+      credentials: 'include',
+      headers: { 'Accept': 'application/json' }
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(projects => {
+        sendResponse({ success: true, projects: projects });
+      })
+      .catch(error => {
+        console.error('Load projects error:', error);
+        sendResponse({
+          success: false,
+          error: error.message
+        });
+      });
+
+    return true;
+  }
   });

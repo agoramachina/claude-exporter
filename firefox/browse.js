@@ -124,24 +124,36 @@ async function loadOrgId() {
   });
 }
 
-// Load projects from API
+// Helper function to find a claude.ai tab and send a message
+async function sendMessageToClaudeTab(action, data) {
+  // Find a claude.ai tab
+  const tabs = await chrome.tabs.query({ url: 'https://claude.ai/*' });
+
+  if (tabs.length === 0) {
+    throw new Error('Please open a Claude.ai tab first to use this feature');
+  }
+
+  // Send message to the first claude.ai tab
+  return new Promise((resolve, reject) => {
+    chrome.tabs.sendMessage(tabs[0].id, { action, ...data }, (response) => {
+      if (chrome.runtime.lastError) {
+        reject(new Error(chrome.runtime.lastError.message));
+      } else if (response && response.success) {
+        resolve(response);
+      } else {
+        reject(new Error(response?.error || 'Request failed'));
+      }
+    });
+  });
+}
+
+// Load projects from API via content script
 async function loadProjects() {
   if (!orgId) return [];
 
   try {
-    const response = await fetch(`https://claude.ai/api/organizations/${orgId}/projects`, {
-      credentials: 'include',
-      headers: {
-        'Accept': 'application/json',
-      }
-    });
-
-    if (!response.ok) {
-      console.warn(`Failed to load projects: ${response.status}`);
-      return [];
-    }
-
-    const projects = await response.json();
+    const response = await sendMessageToClaudeTab('loadProjects', { orgId });
+    const projects = response.projects;
     console.log(`Loaded ${projects.length} projects:`, projects);
 
     // Store projects globally and build map
@@ -168,18 +180,8 @@ async function loadConversations() {
     // Load projects first
     const projects = await loadProjects();
 
-    const response = await fetch(`https://claude.ai/api/organizations/${orgId}/chat_conversations`, {
-      credentials: 'include',
-      headers: {
-        'Accept': 'application/json',
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to load conversations: ${response.status}`);
-    }
-
-    allConversations = await response.json();
+    const response = await sendMessageToClaudeTab('loadConversations', { orgId });
+    allConversations = response.conversations;
     console.log(`Loaded ${allConversations.length} conversations`);
 
     // Log first conversation to see structure
