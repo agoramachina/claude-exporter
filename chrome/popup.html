@@ -22,25 +22,23 @@
       --link-color: #8b7aff;
     }
 
-    /* Light mode when explicitly chosen */
-    @media (prefers-color-scheme: light) {
-      :root {
-        --bg-color: #ffffff;
-        --text-color: #333333;
-        --border-color: #dddddd;
-        --primary-color: #5436DA;
-        --primary-hover: #4329B8;
-        --secondary-color: #28a745;
-        --secondary-hover: #218838;
-        --disabled-bg: #cccccc;
-        --success-bg: #d4edda;
-        --success-text: #155724;
-        --error-bg: #f8d7da;
-        --error-text: #721c24;
-        --info-bg: #d1ecf1;
-        --info-text: #0c5460;
-        --link-color: #5436DA;
-      }
+    /* Light mode when system prefers light */
+    :root[data-theme="light"] {
+      --bg-color: #ffffff;
+      --text-color: #333333;
+      --border-color: #dddddd;
+      --primary-color: #5436DA;
+      --primary-hover: #4329B8;
+      --secondary-color: #28a745;
+      --secondary-hover: #218838;
+      --disabled-bg: #cccccc;
+      --success-bg: #d4edda;
+      --success-text: #155724;
+      --error-bg: #f8d7da;
+      --error-text: #721c24;
+      --info-bg: #d1ecf1;
+      --info-text: #0c5460;
+      --link-color: #5436DA;
     }
 
     body {
@@ -207,6 +205,31 @@
   <div id="status"></div>
   </div>
 
+  <script>
+    // Detect and apply system theme preference
+    (function() {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+
+      // Default to dark unless system explicitly prefers light
+      if (prefersLight && !prefersDark) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+
+      // Listen for theme changes
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (e.matches) {
+          document.documentElement.removeAttribute('data-theme');
+        }
+      });
+
+      window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', (e) => {
+        if (e.matches) {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      });
+    })();
+  </script>
   <script src="utils.js"></script>
   <script src="popup.js"></script>
 </body>
