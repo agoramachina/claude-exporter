@@ -191,6 +191,12 @@ claude-exporter/
 - Some special content types (like artifacts) may not export perfectly
 - Rate limiting: The extension processes conversations in small batches to avoid overwhelming the API
 
+## TODO
+
+- Memory export
+- Claude Code export
+- PDF export for artifacts
+
 ## Contributing
 
 Feel free to submit issues or pull requests if you find bugs or have suggestions for improvements!
