@@ -62,6 +62,18 @@
 
 ## Pending 🔄
 
+- **Memory export**
+  - Export Claude.ai memory (global and project-specific)
+  - Add memory information to conversation exports
+
+- **Claude Code export**
+  - Support exporting Claude Code conversations
+  - Handle code-specific content and artifacts
+
+- **PDF export for artifacts**
+  - Generate PDF versions of artifacts
+  - Useful for documentation and sharing
+
 - **Filter bash tool uses from artifact extraction**
   - Sometimes simple bash calls create artifact.sh files
   - Need to better distinguish real artifacts from tool use results
