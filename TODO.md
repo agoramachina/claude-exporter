@@ -73,10 +73,6 @@
   - Let users choose their preference for all formats
   - Useful for preserving alternate conversation paths
 
-- **Memory export**
-  - Export Claude.ai memory (global and project-specific)
-  - Add memory information to conversation exports
-
 - **Claude Code export**
   - Support exporting Claude Code conversations
   - Handle code-specific content and artifacts
