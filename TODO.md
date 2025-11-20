@@ -60,10 +60,14 @@
     - Each artifact prefixed with conversation name
     - Filename: `claude-artifacts-{timestamp}.zip` (distinguishes from other exports)
 
-- **Firefox support** (v1.8.0)
+- **Firefox support** (v1.8.0-1.8.1)
   - Complete Firefox-compatible version with Manifest V2
   - Separate chrome/ and firefox/ folders with standalone extensions
-  - Updated installation guides for both platforms
+  - Mozilla-signed .xpi for permanent installation (v1.8.1)
+  - Consolidated installation documentation in INSTALL.md
+  - Theme syncing between popup and browse window
+  - Local timezone support in export filenames
+  - Cleaner filename format (YYYYMMDD-HHMMSS)
 
 ## Pending 🔄
 
@@ -91,7 +95,7 @@
   - Need to better distinguish real artifacts from tool use results
   - Check for additional indicators beyond just `filename` field
 
-## Current Version: 1.8.1
+## Current Version: 1.8.2
 
 ## Notes
 
