@@ -18,53 +18,13 @@ A browser extension for Chrome and Firefox that allows you to export your Claude
 
 ## Installation
 
-### From Releases (Recommended for Firefox)
+**Chrome (and Chromium-based browsers):**
+Download and extract the `claude-exporter-chrome` zip from the [Releases page](https://github.com/agoramachina/claude-exporter/releases) into a safe folder (this will be the folder Chrome looks for the extension in, so don't move or change it). With developer mode enabled, go to `chrome://extensions` and click the **Load unpacked** button. Select the extracted folder.
 
-**Firefox users**: Download the latest signed `.xpi` file from the [Releases page](https://github.com/agoramachina/claude-exporter/releases) and drag it into Firefox. See the [Firefox Installation Guide](FIREFOX_INSTALL.md) for details.
+**Firefox:**
+Download the latest signed `.xpi` file from the [Releases page](https://github.com/agoramachina/claude-exporter/releases) and drag it into Firefox.
 
-### From Source
-
-**Prerequisites:**
-- **Chrome**: Google Chrome browser (or Chromium-based browser like Edge, Brave, etc.)
-- **Firefox**: Mozilla Firefox (version 58 or later)
-- A Claude.ai account
-
-### Chrome Installation
-
-1. **Download or Clone the Repository**
-   ```bash
-   git clone https://github.com/agoramachina/claude-exporter.git
-   cd claude-exporter
-   ```
-
-2. **Open Chrome Extensions Page**
-   - Navigate to `chrome://extensions/`
-   - Or click the three dots menu → More Tools → Extensions
-
-3. **Enable Developer Mode**
-   - Toggle the "Developer mode" switch in the top right corner
-
-4. **Load the Extension**
-   - Click "Load unpacked"
-   - Select the `chrome` folder (inside the repository)
-   - The extension icon should appear in your toolbar
-
-5. **Configure Your Organization ID**
-   - Click the extension icon
-   - You'll see a notice about configuring your Organization ID
-   - Click "Click here to set it up" or right-click the extension icon → Options
-   - Go to `https://claude.ai/settings/account`
-   - Copy your Organization ID
-   - Paste it in the extension options and click Save
-   - Click "Test Connection" to verify it works
-
-### Firefox Installation
-
-**🦊 Firefox users**: See the complete [Firefox Installation Guide](FIREFOX_INSTALL.md) for:
-- Installing the signed `.xpi` file (recommended - easiest method!)
-- Temporary installation for development
-- Configuration and troubleshooting
-- Firefox-specific features and differences
+**For detailed installation instructions, troubleshooting, and installing from source**, see [INSTALL.md](INSTALL.md).
 
 ## Usage
 
@@ -142,7 +102,8 @@ claude-exporter/
 │   ├── jszip.min.js      # Library for creating ZIP files
 │   └── icons...          # Extension icons
 ├── README.md             # This file
-├── FIREFOX_INSTALL.md    # Firefox installation guide
+├── INSTALL.md            # Detailed installation guide
+├── FIREFOX_INSTALL.md    # Firefox installation guide (legacy)
 └── LICENSE.md            # MIT License
 ```
 
