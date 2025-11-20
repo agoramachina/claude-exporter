@@ -105,6 +105,11 @@
   - Display current conversation being processed
   - Provide visual feedback during large exports
 
+- **Memory export (global and project-specific)**
+  - Export custom instructions and memory from Claude.ai
+  - Support both global/account-level memory and project-specific memory
+  - Allow backup and archival of configured AI behavior and context
+
 ## Current Version: 1.8.5
 
 ## Notes
