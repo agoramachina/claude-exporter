@@ -50,7 +50,7 @@ document.getElementById('openOptions').addEventListener('click', (e) => {
   
   // Get current conversation ID from URL
   async function getCurrentConversationId() {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
     const url = new URL(tab.url);
     const match = url.pathname.match(/\/chat\/([a-f0-9-]+)/);
     return match ? match[1] : null;
@@ -86,8 +86,8 @@ document.getElementById('exportCurrent').addEventListener('click', async () => {
     if (!conversationId) {
       throw new Error('Could not detect conversation ID. Make sure you are on a Claude.ai conversation page.');
     }
-    
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+    const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
     
     // Check if we're on Claude.ai
     if (!tab.url.includes('claude.ai')) {
@@ -146,8 +146,8 @@ document.getElementById('exportCurrent').addEventListener('click', async () => {
           if (!orgId) {
       throw new Error('Organization ID not configured. Click the setup link above to configure it.');
       }
-      
-      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+      const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
       
           chrome.tabs.sendMessage(tab.id, {
       action: 'exportAllConversations',

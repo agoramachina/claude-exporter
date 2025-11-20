@@ -95,7 +95,7 @@
   - Need to better distinguish real artifacts from tool use results
   - Check for additional indicators beyond just `filename` field
 
-## Current Version: 1.8.4
+## Current Version: 1.8.5
 
 ## Notes
 
