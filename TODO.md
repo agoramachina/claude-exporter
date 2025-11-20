@@ -95,6 +95,16 @@
   - Need to better distinguish real artifacts from tool use results
   - Check for additional indicators beyond just `filename` field
 
+- **Artifact search/filter in browse view**
+  - Add ability to search or filter conversations by artifact content
+  - Filter by artifact filename, type, or whether artifacts exist
+  - Helps find specific artifacts across all conversations
+
+- **Export progress indicator on browse page**
+  - Show progress bar when exporting from browse view
+  - Display current conversation being processed
+  - Provide visual feedback during large exports
+
 ## Current Version: 1.8.5
 
 ## Notes
