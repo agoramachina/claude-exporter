@@ -16,6 +16,7 @@ A browser extension for Chrome and Firefox that allows you to export your Claude
 - 🤖 **Complete Model Information** - Preserves and displays model information for all conversations
 - 🔮 **Smart Model Inference** - Automatically infers the correct model for conversations that used the default model at the time
 
+---
 ## Installation
 
 ### Chrome (and Chromium-based browsers)
@@ -34,6 +35,7 @@ A browser extension for Chrome and Firefox that allows you to export your Claude
 
 **For detailed installation instructions, troubleshooting, and installing from source**, see [INSTALL.md](INSTALL.md).
 
+---
 ## Configuration
 
 After installing the extension in either browser:
@@ -48,6 +50,7 @@ After installing the extension in either browser:
 3. Click **Test Connection** to verify it works
 4. You should see a success message if everything is configured correctly!
 
+---
 ## Usage
 
 ### Export Current Conversation
@@ -72,6 +75,7 @@ After installing the extension in either browser:
 3. A progress dialog will show the export status
 4. Once complete, a ZIP file will download containing all conversations
 
+---
 ## Export Formats
 
 ### JSON
@@ -91,6 +95,7 @@ After installing the extension in either browser:
 - Shows only the current conversation branch
 - Ideal for copying into other LLMs or text editors
 
+---
 ## Troubleshooting
 
 ### "Organization ID not configured"
@@ -110,13 +115,9 @@ After installing the extension in either browser:
 - Make sure you're using the latest version of the extension
 - Try reloading the extension from chrome://extensions/
 
-## Privacy & Security
+**For browser-specific troubleshooting issues, see [INSTALL.md](INSTALL.md)
 
-- **Local Processing**: All data processing happens in your browser
-- **No External Servers**: The extension doesn't send data anywhere
-- **Your Authentication**: Uses your existing Claude.ai session
-- **Open Source**: You can review all code before installation
-
+---
 ## Known Limitations
 
 - Plaintext and markdown formats only export the currently selected branch in conversations with multiple branches
@@ -124,10 +125,20 @@ After installing the extension in either browser:
 - Some special content types (like artifacts) may not export perfectly
 - Rate limiting: The extension processes conversations in small batches to avoid overwhelming the API
 
+---
+## Privacy & Security
+
+- **Local Processing**: All data processing happens in your browser
+- **No External Servers**: The extension doesn't send data anywhere
+- **Your Authentication**: Uses your existing Claude.ai session
+- **Open Source**: You can review all code before installation
+
+---
 ## Contributing
 
 Feel free to submit issues or pull requests if you find bugs or have suggestions for improvements!
 
+---
 ## Acknowledgments
 
 - **Original Project**: Forked from [socketteer/Claude-Conversation-Exporter](https://github.com/socketteer/Claude-Conversation-Exporter)
