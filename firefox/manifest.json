@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Claude Exporter",
-  "version": "1.8.2",
+  "version": "1.8.4",
   "description": "Export conversations and artifacts from Claude.ai",
   "permissions": [
     "activeTab",
@@ -40,10 +40,10 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "{a7f9c8b5-2d4e-4c3a-9b1f-6e8d4c2a1b3f}",
+      "strict_min_version": "79.0",
       "data_collection_permissions": {
         "required": ["none"]
-      },
-      "strict_min_version": "79.0"
+      }
     }
   }
 }
