@@ -7,88 +7,59 @@ A browser extension for Chrome and Firefox that allows you to export your Claude
 - 📥 **Export Individual Conversations** - Export any conversation directly from Claude.ai
 - 📚 **Bulk Export** - Export all or filtered conversations as a ZIP file
 - 🔍 **Browse & Search** - View all your conversations in a searchable table
-- 🌳 **Branch-Aware Export** - Correctly handles conversation branches (exports only the current branch)
+- 🌳 **Branch-Aware Export** - Correctly handles conversation branches
 - 📝 **Multiple Formats** - JSON (full data), Markdown, or Plain Text
 - 📦 **Artifact Export** - Extract artifacts (code, documents, etc.) as separate files
 - 🎯 **Flexible Export Options** - Choose to include conversations, artifacts inline, or artifacts as separate files
 - 🗂️ **ZIP Archives** - Bulk exports create organized ZIP files with conversations and artifacts
 - 🏷️ **Metadata Options** - Include or exclude timestamps, models, and other metadata
-- 🤖 **Complete Model Information** - Preserves and displays model information for all conversations (unlike official Claude.ai exports)
+- 🤖 **Complete Model Information** - Preserves and displays model information for all conversations
 - 🔮 **Smart Model Inference** - Automatically infers the correct model for conversations that used the default model at the time
 
-## Installation from Source
+---
+### Installation
 
-### Prerequisites
-- **Chrome**: Google Chrome browser (or Chromium-based browser like Edge, Brave, etc.)
-- **Firefox**: Mozilla Firefox (version 57 or later)
-- A Claude.ai account
+#### Chrome (and Chromium-based browsers)
+1. Download the `claude-exporter-chrome-vX.X.X.zip` from the [Releases page](https://github.com/agoramachina/claude-exporter/releases)
+2. Extract the zip into a safe folder (this will be the permanent location - don't move or delete it)
+3. Open Chrome and navigate to `chrome://extensions/`
+4. Enable **Developer mode** (toggle in top right)
+5. Click **Load unpacked** and select the extracted `claude-exporter-chrome` folder
+6. Done! Proceed to [Configuration](#Configuration)
 
-### Chrome Installation
+#### Firefox
+1. Download the latest `.xpi` file from the [Releases page](https://github.com/agoramachina/claude-exporter/releases)
+2. Drag and drop the `.xpi` file into Firefox
+3. Click **Add** when Firefox asks for permission
+4. Done! Proceed to [Configuration](#Configuration)
 
-1. **Download or Clone the Repository**
-   ```bash
-   git clone https://github.com/agoramachina/claude-exporter.git
-   cd claude-exporter
-   ```
+**For detailed installation instructions, troubleshooting, and installing from source**, see [INSTALL.md](INSTALL.md).
 
-2. **Open Chrome Extensions Page**
-   - Navigate to `chrome://extensions/`
-   - Or click the three dots menu → More Tools → Extensions
+---
+### Configuration
 
-3. **Enable Developer Mode**
-   - Toggle the "Developer mode" switch in the top right corner
+After installing the extension in either browser:
+1. Click the extension icon in your browser toolbar
+2. You'll see a notice about configuring your Organization ID
+3. Click "Click here to set it up" (or right-click the extension icon → Options)
+4. In a new tab, go to `https://claude.ai/settings/account`
+5. Copy your Organization ID from the URL
+   - It should be in this format: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
+1. Return to the extension options and paste the Organization ID
+2. Click **Save**
+3. Click **Test Connection** to verify it works
+4. You should see a success message if everything is configured correctly!
 
-4. **Load the Extension**
-   - Click "Load unpacked"
-   - Select the `chrome` folder (inside the repository)
-   - The extension icon should appear in your toolbar
+---
+### Usage
 
-5. **Configure Your Organization ID**
-   - Click the extension icon
-   - You'll see a notice about configuring your Organization ID
-   - Click "Click here to set it up" or right-click the extension icon → Options
-   - Go to `https://claude.ai/settings/account`
-   - Copy your Organization ID
-   - Paste it in the extension options and click Save
-   - Click "Test Connection" to verify it works
-
-### Firefox Installation
-
-**🦊 Firefox users**: Please see the [Firefox Installation Guide](FIREFOX_INSTALL.md) for detailed Firefox-specific installation instructions.
-
-**Quick Firefox Setup:**
-
-1. **Download or Clone the Repository**
-   ```bash
-   git clone https://github.com/agoramachina/claude-exporter.git
-   cd claude-exporter
-   ```
-
-2. **Load in Firefox**
-   - Navigate to `about:debugging`
-   - Click "This Firefox" → "Load Temporary Add-on..."
-   - Select the `manifest.json` file from the `firefox` folder
-
-3. **Configure Your Organization ID** (same as Chrome)
-   - Click the extension icon
-   - You'll see a notice about configuring your Organization ID
-   - Click "Click here to set it up"
-   - Go to `https://claude.ai/settings/account`
-   - Copy your Organization ID
-   - Paste it in the extension options and click Save
-   - Click "Test Connection" to verify it works
-
-For permanent installation and Firefox-specific troubleshooting, see [FIREFOX_INSTALL.md](FIREFOX_INSTALL.md).
-
-## Usage
-
-### Export Current Conversation
-1. Navigate to any conversation on Claude.ai
+#### Export Current Conversation
+1. Navigate to any conversation on claude.ai
 2. Click the extension icon
 3. Choose your export format and metadata preferences
 4. Click "Export Current Conversation"
 
-### Browse All Conversations
+#### Browse All Conversations
 1. Click the extension icon
 2. Click "Browse All Conversations" (green button)
 3. In the browse page, you can:
@@ -97,111 +68,78 @@ For permanent installation and Firefox-specific troubleshooting, see [FIREFOX_IN
    - Sort by date or name
    - Export individual conversations
    - Export all filtered conversations as ZIP
-
-### Bulk Export
+   
+#### Bulk Export
 1. In the browse page, select your format and filters
 2. Click "Export All"
 3. A progress dialog will show the export status
 4. Once complete, a ZIP file will download containing all conversations
 
-## Export Formats
+---
+### Export Formats
 
-### JSON
+#### JSON
 - Complete data including all branches and metadata
 - Best for data preservation and programmatic use
 - Includes all message versions and conversation branches
 
-### Markdown
+#### Markdown
 - Human-readable format with formatting
 - Shows only the current conversation branch
 - Includes optional metadata (timestamps, model info)
 - Great for documentation or sharing
 
-### Plain Text
+#### Plain Text
 - Simple format following Claude's prompt style
 - Uses "User:" and "Claude:" prefixes
 - Shows only the current conversation branch
 - Ideal for copying into other LLMs or text editors
 
-## File Structure
+---
+### Troubleshooting
 
-```
-claude-exporter/
-├── chrome/               # Chrome extension (complete, ready to load)
-│   ├── manifest.json     # Chrome manifest (Manifest V3)
-│   ├── background.js     # Background service worker
-│   ├── content.js        # Content script for Claude.ai pages
-│   ├── content.css       # Styles for content script
-│   ├── popup.html        # Extension popup interface
-│   ├── popup.js          # Popup functionality
-│   ├── options.html      # Options page for configuration
-│   ├── options.js        # Options page logic
-│   ├── browse.html       # Conversation browser interface
-│   ├── browse.js         # Browser page functionality
-│   ├── utils.js          # Shared utility functions
-│   ├── jszip.min.js      # Library for creating ZIP files
-│   └── icons...          # Extension icons
-├── firefox/              # Firefox extension (complete, ready to load)
-│   ├── manifest.json     # Firefox manifest (Manifest V2)
-│   ├── background.js     # Firefox-compatible background script
-│   ├── content.js        # Content script for Claude.ai pages
-│   ├── content.css       # Styles for content script
-│   ├── popup.html        # Extension popup interface
-│   ├── popup.js          # Popup functionality
-│   ├── options.html      # Options page for configuration
-│   ├── options.js        # Options page logic
-│   ├── browse.html       # Conversation browser interface
-│   ├── browse.js         # Browser page functionality
-│   ├── utils.js          # Shared utility functions
-│   ├── jszip.min.js      # Library for creating ZIP files
-│   └── icons...          # Extension icons
-├── README.md             # This file
-├── FIREFOX_INSTALL.md    # Firefox installation guide
-└── LICENSE.md            # MIT License
-```
-
-## Troubleshooting
-
-### "Organization ID not configured"
+#### "Organization ID not configured"
 - Follow the setup steps in the Configuration section
 - Make sure you're copying the complete UUID from the URL
 
-### "Not authenticated" error
+#### "Not authenticated" error
 - Make sure you're logged into Claude.ai
 - Try refreshing the Claude.ai page
 
-### Export fails for some conversations
+#### Export fails for some conversations
 - Some very old conversations might have different data structures
 - Check the browser console for specific error messages
 - The ZIP export includes a summary file listing any failed exports
 
-### Content Security Policy errors
+#### Content Security Policy errors
 - Make sure you're using the latest version of the extension
 - Try reloading the extension from chrome://extensions/
 
-## Privacy & Security
+**For browser-specific troubleshooting issues**, see [INSTALL.md](INSTALL.md)
 
-- **Local Processing**: All data processing happens in your browser
-- **No External Servers**: The extension doesn't send data anywhere
-- **Your Authentication**: Uses your existing Claude.ai session
-- **Open Source**: You can review all code before installation
-
-## Known Limitations
+---
+### Known Limitations
 
 - Plaintext and markdown formats only export the currently selected branch in conversations with multiple branches
 - Large bulk exports may take several minutes
 - Some special content types (like artifacts) may not export perfectly
 - Rate limiting: The extension processes conversations in small batches to avoid overwhelming the API
 
-## Contributing
+---
+### Privacy & Security
+
+- **Local Processing**: All data processing happens in your browser
+- **No External Servers**: The extension doesn't send data anywhere
+- **Your Authentication**: Uses your existing Claude.ai session
+- **Open Source**: You can review all code before installation
+
+---
+### Contributing
 
 Feel free to submit issues or pull requests if you find bugs or have suggestions for improvements!
 
-## License
-
-MIT License - See [LICENSE.md](LICENSE.md) for details.
-
-## Acknowledgments
+---
+### Acknowledgments
 
 - **Original Project**: Forked from [socketteer/Claude-Conversation-Exporter](https://github.com/socketteer/Claude-Conversation-Exporter)
 - **Code Development**: Written in collaboration with Claude Sonnet 4.5
