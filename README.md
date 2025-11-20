@@ -7,29 +7,51 @@ A browser extension for Chrome and Firefox that allows you to export your Claude
 - 📥 **Export Individual Conversations** - Export any conversation directly from Claude.ai
 - 📚 **Bulk Export** - Export all or filtered conversations as a ZIP file
 - 🔍 **Browse & Search** - View all your conversations in a searchable table
-- 🌳 **Branch-Aware Export** - Correctly handles conversation branches (exports only the current branch)
+- 🌳 **Branch-Aware Export** - Correctly handles conversation branches
 - 📝 **Multiple Formats** - JSON (full data), Markdown, or Plain Text
 - 📦 **Artifact Export** - Extract artifacts (code, documents, etc.) as separate files
 - 🎯 **Flexible Export Options** - Choose to include conversations, artifacts inline, or artifacts as separate files
 - 🗂️ **ZIP Archives** - Bulk exports create organized ZIP files with conversations and artifacts
 - 🏷️ **Metadata Options** - Include or exclude timestamps, models, and other metadata
-- 🤖 **Complete Model Information** - Preserves and displays model information for all conversations (unlike official Claude.ai exports)
+- 🤖 **Complete Model Information** - Preserves and displays model information for all conversations
 - 🔮 **Smart Model Inference** - Automatically infers the correct model for conversations that used the default model at the time
 
 ## Installation
 
-**Chrome (and Chromium-based browsers):**
-Download and extract the `claude-exporter-chrome` zip from the [Releases page](https://github.com/agoramachina/claude-exporter/releases) into a safe folder (this will be the folder Chrome looks for the extension in, so don't move or change it). With developer mode enabled, go to `chrome://extensions` and click the **Load unpacked** button. Select the extracted folder.
+### Chrome (and Chromium-based browsers)
+1. Download the `claude-exporter-chrome-vX.X.X.zip` from the [Releases page](https://github.com/agoramachina/claude-exporter/releases)
+2. Extract the zip into a safe folder (this will be the permanent location - don't move or delete it)
+3. Open Chrome and navigate to `chrome://extensions/`
+4. Enable **Developer mode** (toggle in top right)
+5. Click **Load unpacked** and select the extracted `claude-exporter-chrome` folder
+6. Done! Proceed to [Configuration](#Configuration)
 
-**Firefox:**
-Download the latest signed `.xpi` file from the [Releases page](https://github.com/agoramachina/claude-exporter/releases) and drag it into Firefox.
+### Firefox
+1. Download the latest `.xpi` file from the [Releases page](https://github.com/agoramachina/claude-exporter/releases)
+2. Drag and drop the `.xpi` file into Firefox
+3. Click **Add** when Firefox asks for permission
+4. Done! Proceed to [Configuration](#Configuration)
 
 **For detailed installation instructions, troubleshooting, and installing from source**, see [INSTALL.md](INSTALL.md).
+
+## Configuration
+
+After installing the extension in either browser:
+1. Click the extension icon in your browser toolbar
+2. You'll see a notice about configuring your Organization ID
+3. Click "Click here to set it up" (or right-click the extension icon → Options)
+4. In a new tab, go to `https://claude.ai/settings/account`
+5. Copy your Organization ID from the URL
+   - It should be in this format: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
+1. Return to the extension options and paste the Organization ID
+2. Click **Save**
+3. Click **Test Connection** to verify it works
+4. You should see a success message if everything is configured correctly!
 
 ## Usage
 
 ### Export Current Conversation
-1. Navigate to any conversation on Claude.ai
+1. Navigate to any conversation on claude.ai
 2. Click the extension icon
 3. Choose your export format and metadata preferences
 4. Click "Export Current Conversation"
@@ -43,7 +65,7 @@ Download the latest signed `.xpi` file from the [Releases page](https://github.c
    - Sort by date or name
    - Export individual conversations
    - Export all filtered conversations as ZIP
-
+   
 ### Bulk Export
 1. In the browse page, select your format and filters
 2. Click "Export All"
@@ -68,44 +90,6 @@ Download the latest signed `.xpi` file from the [Releases page](https://github.c
 - Uses "User:" and "Claude:" prefixes
 - Shows only the current conversation branch
 - Ideal for copying into other LLMs or text editors
-
-## File Structure
-
-```
-claude-exporter/
-├── chrome/               # Chrome extension (complete, ready to load)
-│   ├── manifest.json     # Chrome manifest (Manifest V3)
-│   ├── background.js     # Background service worker
-│   ├── content.js        # Content script for Claude.ai pages
-│   ├── content.css       # Styles for content script
-│   ├── popup.html        # Extension popup interface
-│   ├── popup.js          # Popup functionality
-│   ├── options.html      # Options page for configuration
-│   ├── options.js        # Options page logic
-│   ├── browse.html       # Conversation browser interface
-│   ├── browse.js         # Browser page functionality
-│   ├── utils.js          # Shared utility functions
-│   ├── jszip.min.js      # Library for creating ZIP files
-│   └── icons...          # Extension icons
-├── firefox/              # Firefox extension (complete, ready to load)
-│   ├── manifest.json     # Firefox manifest (Manifest V2)
-│   ├── background.js     # Firefox-compatible background script
-│   ├── content.js        # Content script for Claude.ai pages
-│   ├── content.css       # Styles for content script
-│   ├── popup.html        # Extension popup interface
-│   ├── popup.js          # Popup functionality
-│   ├── options.html      # Options page for configuration
-│   ├── options.js        # Options page logic
-│   ├── browse.html       # Conversation browser interface
-│   ├── browse.js         # Browser page functionality
-│   ├── utils.js          # Shared utility functions
-│   ├── jszip.min.js      # Library for creating ZIP files
-│   └── icons...          # Extension icons
-├── README.md             # This file
-├── INSTALL.md            # Detailed installation guide
-├── FIREFOX_INSTALL.md    # Firefox installation guide (legacy)
-└── LICENSE.md            # MIT License
-```
 
 ## Troubleshooting
 
