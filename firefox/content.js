@@ -1,3 +1,16 @@
+// DEBUG: Log immediately to verify script loads
+console.log('[Claude Exporter] Content script file is being executed');
+console.log('[Claude Exporter] window object exists:', typeof window !== 'undefined');
+console.log('[Claude Exporter] browser API exists:', typeof browser !== 'undefined');
+console.log('[Claude Exporter] chrome API exists:', typeof chrome !== 'undefined');
+
+// Prevent double-injection of content script
+if (window.claudeExporterContentScriptLoaded) {
+  console.log('[Claude Exporter] Content script already loaded, skipping re-injection');
+} else {
+  window.claudeExporterContentScriptLoaded = true;
+  console.log('[Claude Exporter] Content script loading for first time');
+
 // Note: Organization ID is now stored in extension settings
 // Users need to configure it in the extension options page
 
@@ -79,8 +92,9 @@ function inferModel(conversation) {
     
     return await response.json();
   }
+
   // Handle messages from popup
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'exportConversation') {
     console.log('Export conversation request received:', request);
 
@@ -470,3 +484,5 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
   }
   });
+
+} // End of double-injection guard
