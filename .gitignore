@@ -1,0 +1,20 @@
+# Release builds
+releases/
+
+# macOS
+.DS_Store
+__MACOSX
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node modules (if using any build tools in future)
+node_modules/
+
+# Temporary files
+*.tmp
+*.bak
