@@ -945,7 +945,7 @@ async function exportAllFiltered() {
 // Show error message
 function showError(message) {
   const tableContent = document.getElementById('tableContent');
-  tableContent.innerHTML = `<div class="error">${message}</div>`;
+  tableContent.innerHTML = `<div class="error">${escapeHtml(message)}</div>`;
 }
 
 // Show toast notification
