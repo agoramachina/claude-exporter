@@ -1,3 +1,9 @@
+// Prevent double-injection of content script
+if (window.claudeExporterContentScriptLoaded) {
+  console.log('Claude Exporter content script already loaded, skipping re-injection');
+} else {
+  window.claudeExporterContentScriptLoaded = true;
+
 // Note: Organization ID is now stored in extension settings
 // Users need to configure it in the extension options page
 
@@ -470,3 +476,5 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
   }
   });
+
+} // End of double-injection guard
