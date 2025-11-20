@@ -41,6 +41,7 @@
     "gecko": {
       "id": "{a7f9c8b5-2d4e-4c3a-9b1f-6e8d4c2a1b3f}",
       "strict_min_version": "58.0"
-    }
+    },
+    "data_collection_permissions": {}
   }
 }
