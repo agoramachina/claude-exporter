@@ -7,6 +7,7 @@ A browser extension for Chrome and Firefox that allows you to export your Claude
 - 📥 **Export Individual Conversations** - Export any conversation directly from Claude.ai
 - 📚 **Bulk Export** - Export all or filtered conversations as a ZIP file
 - 🔍 **Browse & Search** - View all your conversations in a searchable table
+- 🔀 Sort Conversations - Sort by name, date, project, model, and more
 - 🌳 **Branch-Aware Export** - Correctly handles conversation branches
 - 📝 **Multiple Formats** - JSON (full data), Markdown, or Plain Text
 - 📦 **Artifact Export** - Extract artifacts (code, documents, etc.) as separate files
@@ -15,6 +16,7 @@ A browser extension for Chrome and Firefox that allows you to export your Claude
 - 🏷️ **Metadata Options** - Include or exclude timestamps, models, and other metadata
 - 🤖 **Complete Model Information** - Preserves and displays model information for all conversations
 - 🔮 **Smart Model Inference** - Automatically infers the correct model for conversations that used the default model at the time
+- ☀️ Light/Dark Mode - Toggle between color schemes
 
 ---
 ### Installation
@@ -115,7 +117,7 @@ After installing the extension in either browser:
 - Make sure you're using the latest version of the extension
 - Try reloading the extension from chrome://extensions/
 
-**For browser-specific troubleshooting issues**, see [INSTALL.md](INSTALL.md)
+**For browser-specific troubleshooting issues**, see [INSTALL.md](./INSTALL.md#Troubleshooting)
 
 ---
 ### Known Limitations
