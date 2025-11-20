@@ -45,10 +45,10 @@ After installing the extension in either browser:
 4. In a new tab, go to `https://claude.ai/settings/account`
 5. Copy your Organization ID from the URL
    - It should be in this format: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
-1. Return to the extension options and paste the Organization ID
-2. Click **Save**
-3. Click **Test Connection** to verify it works
-4. You should see a success message if everything is configured correctly!
+6. Return to the extension options and paste the Organization ID
+7. Click **Save**
+8. Click **Test Connection** to verify it works
+9. You should see a success message if everything is configured correctly!
 
 ---
 ### Usage
