@@ -3,46 +3,55 @@
 This guide explains how to install Claude Exporter in Mozilla Firefox.
 
 ## Prerequisites
-- Mozilla Firefox (version 57 or later)
+- Mozilla Firefox (version 58 or later)
 - A Claude.ai account
 
 ## Installation Steps
 
-### 1. Download or Clone the Repository
+### Option 1: Signed Extension (Recommended)
 
-```bash
-git clone https://github.com/agoramachina/claude-exporter.git
-cd claude-exporter
-```
+**Easiest method - permanent installation with no developer mode required!**
 
-### 2. Load the Extension in Firefox
+1. Go to the [Releases page](https://github.com/agoramachina/claude-exporter/releases)
+2. Download the latest `.xpi` file (e.g., `claude-exporter-firefox-v1.8.1.xpi`)
+3. Drag and drop the `.xpi` file into Firefox
+4. Click "Add" when Firefox asks for permission
+5. Done! The extension is permanently installed
 
-#### Option A: Temporary Installation (For Testing)
+### Option 2: Temporary Installation (For Development)
 
-1. Open Firefox and navigate to `about:debugging`
-2. Click "This Firefox" in the left sidebar
-3. Click "Load Temporary Add-on..."
-4. Navigate to the `firefox` folder (inside the repository)
-5. Select the `manifest.json` file
-6. The extension will be loaded temporarily (until you restart Firefox)
+If you want to work on the extension code:
 
-#### Option B: Permanent Installation (Developer Mode)
+1. Download or clone the repository:
+   ```bash
+   git clone https://github.com/agoramachina/claude-exporter.git
+   cd claude-exporter
+   ```
+2. Open Firefox and navigate to `about:debugging`
+3. Click "This Firefox" in the left sidebar
+4. Click "Load Temporary Add-on..."
+5. Navigate to the `firefox` folder (inside the repository)
+6. Select the `manifest.json` file
+7. The extension will be loaded temporarily (until you restart Firefox)
 
-For development and testing, you can:
+### Option 3: Developer Installation (Unsigned, Permanent)
 
-1. Open Firefox and navigate to `about:config`
-2. Search for `xpinstall.signatures.required`
-3. Set it to `false` (this allows unsigned extensions)
-4. Package the extension:
+**Not recommended** - only for advanced development scenarios:
+
+1. Clone the repository (see Option 2)
+2. Open Firefox and navigate to `about:config`
+3. Search for `xpinstall.signatures.required`
+4. Set it to `false` (this allows unsigned extensions)
+5. Package the extension:
    ```bash
    cd firefox
    zip -r ../claude-exporter-firefox.zip *
    ```
-5. Go to `about:addons`
-6. Click the gear icon → "Install Add-on From File..."
-7. Select the `claude-exporter-firefox.zip` file
+6. Go to `about:addons`
+7. Click the gear icon → "Install Add-on From File..."
+8. Select the `claude-exporter-firefox.zip` file
 
-**Note**: Setting `xpinstall.signatures.required` to `false` is only recommended for development. For regular use, temporary installation is safer.
+**Note**: Setting `xpinstall.signatures.required` to `false` disables security protections. Only use for development.
 
 ### 3. Configure Your Organization ID
 
@@ -116,15 +125,16 @@ If you see this error when exporting from a conversation page:
 2. Refresh the page and try again
 3. If the problem persists, use "Browse All Conversations" to export instead
 
-## Differences Between Temporary and Permanent Installation
+## Differences Between Installation Methods
 
-| Feature | Temporary | Permanent (Unsigned) | AMO Published |
-|---------|-----------|---------------------|---------------|
-| Persists after restart | ❌ | ✅ | ✅ |
-| Auto-updates | ❌ | ❌ | ✅ |
-| Requires dev mode | ❌ | ✅ | ❌ |
-| Easy to install | ✅ | ⚠️ | ✅ |
-| Recommended for | Testing | Development | Production |
+| Feature | Signed .xpi (Recommended) | Temporary | Unsigned (Dev Mode) | AMO Published |
+|---------|---------------------------|-----------|---------------------|---------------|
+| Persists after restart | ✅ | ❌ | ✅ | ✅ |
+| Auto-updates | ❌ | ❌ | ❌ | ✅ |
+| Requires dev mode | ❌ | ❌ | ✅ | ❌ |
+| Easy to install | ✅ | ✅ | ⚠️ | ✅ |
+| Mozilla-signed | ✅ | N/A | ❌ | ✅ |
+| Recommended for | General use | Development/testing | Advanced development | General use |
 
 ## Using Both Browsers
 
@@ -144,8 +154,8 @@ Both folders are complete, standalone extensions with no need to switch files!
 
 If you encounter issues specific to Firefox, please:
 1. Check the Browser Console (Ctrl+Shift+J) for errors
-2. Verify you're loading from the `firefox/` folder
-3. Make sure your Firefox version is 57 or later
+2. Verify you're using the signed `.xpi` or loading from the `firefox/` folder
+3. Make sure your Firefox version is 58 or later
 4. Open an issue on the repository with "Firefox:" in the title
 
 ---

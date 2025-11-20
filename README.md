@@ -16,11 +16,17 @@ A browser extension for Chrome and Firefox that allows you to export your Claude
 - 🤖 **Complete Model Information** - Preserves and displays model information for all conversations (unlike official Claude.ai exports)
 - 🔮 **Smart Model Inference** - Automatically infers the correct model for conversations that used the default model at the time
 
-## Installation from Source
+## Installation
 
-### Prerequisites
+### From Releases (Recommended for Firefox)
+
+**Firefox users**: Download the latest signed `.xpi` file from the [Releases page](https://github.com/agoramachina/claude-exporter/releases) and drag it into Firefox. See the [Firefox Installation Guide](FIREFOX_INSTALL.md) for details.
+
+### From Source
+
+**Prerequisites:**
 - **Chrome**: Google Chrome browser (or Chromium-based browser like Edge, Brave, etc.)
-- **Firefox**: Mozilla Firefox (version 57 or later)
+- **Firefox**: Mozilla Firefox (version 58 or later)
 - A Claude.ai account
 
 ### Chrome Installation
@@ -54,31 +60,11 @@ A browser extension for Chrome and Firefox that allows you to export your Claude
 
 ### Firefox Installation
 
-**🦊 Firefox users**: Please see the [Firefox Installation Guide](FIREFOX_INSTALL.md) for detailed Firefox-specific installation instructions.
-
-**Quick Firefox Setup:**
-
-1. **Download or Clone the Repository**
-   ```bash
-   git clone https://github.com/agoramachina/claude-exporter.git
-   cd claude-exporter
-   ```
-
-2. **Load in Firefox**
-   - Navigate to `about:debugging`
-   - Click "This Firefox" → "Load Temporary Add-on..."
-   - Select the `manifest.json` file from the `firefox` folder
-
-3. **Configure Your Organization ID** (same as Chrome)
-   - Click the extension icon
-   - You'll see a notice about configuring your Organization ID
-   - Click "Click here to set it up"
-   - Go to `https://claude.ai/settings/account`
-   - Copy your Organization ID
-   - Paste it in the extension options and click Save
-   - Click "Test Connection" to verify it works
-
-For permanent installation and Firefox-specific troubleshooting, see [FIREFOX_INSTALL.md](FIREFOX_INSTALL.md).
+**🦊 Firefox users**: See the complete [Firefox Installation Guide](FIREFOX_INSTALL.md) for:
+- Installing the signed `.xpi` file (recommended - easiest method!)
+- Temporary installation for development
+- Configuration and troubleshooting
+- Firefox-specific features and differences
 
 ## Usage
 
@@ -196,10 +182,6 @@ claude-exporter/
 ## Contributing
 
 Feel free to submit issues or pull requests if you find bugs or have suggestions for improvements!
-
-## License
-
-MIT License - See [LICENSE.md](LICENSE.md) for details.
 
 ## Acknowledgments
 
