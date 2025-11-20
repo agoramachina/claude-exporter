@@ -115,7 +115,7 @@ After installing the extension in either browser:
 - Make sure you're using the latest version of the extension
 - Try reloading the extension from chrome://extensions/
 
-**For browser-specific troubleshooting issues**, see [INSTALL.md](INSTALL.md)
+**For browser-specific troubleshooting issues**, see [INSTALL.md](./INSTALL.md#Troubleshooting)
 
 ---
 ### Known Limitations
