@@ -183,10 +183,6 @@ claude-exporter/
 
 Feel free to submit issues or pull requests if you find bugs or have suggestions for improvements!
 
-## License
-
-MIT License - See [LICENSE.md](LICENSE.md) for details.
-
 ## Acknowledgments
 
 - **Original Project**: Forked from [socketteer/Claude-Conversation-Exporter](https://github.com/socketteer/Claude-Conversation-Exporter)
