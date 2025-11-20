@@ -10,6 +10,14 @@ function getLocalDateTimeString() {
   return `${year}${month}${day}-${hours}${minutes}${seconds}`;
 }
 
+// Helper function to escape HTML to prevent XSS
+function escapeHtml(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 // Theme management
 function initTheme() {
   // Check for saved theme preference or default to system preference
@@ -383,34 +391,34 @@ function displayConversations() {
     const projectName = getProjectName(conv);
 
     html += `
-      <tr data-id="${conv.uuid}">
+      <tr data-id="${escapeHtml(conv.uuid)}">
         <td>
           <div class="conversation-name">
-            <a href="https://claude.ai/chat/${conv.uuid}" target="_blank" title="${conv.name}">
-              ${conv.name}
+            <a href="https://claude.ai/chat/${escapeHtml(conv.uuid)}" target="_blank" title="${escapeHtml(conv.name)}">
+              ${escapeHtml(conv.name)}
             </a>
           </div>
         </td>
-        <td>${projectName}</td>
-        <td class="date">${updatedDate}</td>
-        <td class="date">${createdDate}</td>
+        <td>${escapeHtml(projectName)}</td>
+        <td class="date">${escapeHtml(updatedDate)}</td>
+        <td class="date">${escapeHtml(createdDate)}</td>
         <td>
           <span class="model-badge ${modelBadgeClass}">
-            ${formatModelName(conv.model)}
+            ${escapeHtml(formatModelName(conv.model))}
           </span>
         </td>
         <td>
           <div class="actions">
-            <button class="btn-small btn-export" data-id="${conv.uuid}" data-name="${conv.name}">
+            <button class="btn-small btn-export" data-id="${escapeHtml(conv.uuid)}" data-name="${escapeHtml(conv.name)}">
               Export
             </button>
-            <button class="btn-small btn-view" data-id="${conv.uuid}">
+            <button class="btn-small btn-view" data-id="${escapeHtml(conv.uuid)}">
               View
             </button>
           </div>
         </td>
         <td class="checkbox-col">
-          <input type="checkbox" class="conversation-checkbox" data-id="${conv.uuid}" data-index="${index}" ${selectedConversations.has(conv.uuid) ? 'checked' : ''}>
+          <input type="checkbox" class="conversation-checkbox" data-id="${escapeHtml(conv.uuid)}" data-index="${index}" ${selectedConversations.has(conv.uuid) ? 'checked' : ''}>
         </td>
       </tr>
     `;
@@ -937,7 +945,7 @@ async function exportAllFiltered() {
 // Show error message
 function showError(message) {
   const tableContent = document.getElementById('tableContent');
-  tableContent.innerHTML = `<div class="error">${message}</div>`;
+  tableContent.innerHTML = `<div class="error">${escapeHtml(message)}</div>`;
 }
 
 // Show toast notification
