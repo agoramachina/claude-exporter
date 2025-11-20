@@ -428,7 +428,9 @@ function displayConversations() {
       </tbody>
     </table>
   `;
-  
+
+  // Security: All user-provided data in html has been sanitized with escapeHtml()
+  // before concatenation. The HTML structure itself is static/trusted template code.
   tableContent.innerHTML = html;
   
   // Add export button listeners
@@ -945,7 +947,11 @@ async function exportAllFiltered() {
 // Show error message
 function showError(message) {
   const tableContent = document.getElementById('tableContent');
-  tableContent.innerHTML = `<div class="error">${escapeHtml(message)}</div>`;
+  const errorDiv = document.createElement('div');
+  errorDiv.className = 'error';
+  errorDiv.textContent = message;
+  tableContent.innerHTML = '';
+  tableContent.appendChild(errorDiv);
 }
 
 // Show toast notification
