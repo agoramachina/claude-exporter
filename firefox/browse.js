@@ -82,7 +82,7 @@ const MODEL_DISPLAY_NAMES = {
   'claude-3-haiku-20240307': 'Claude Haiku 3',
   'claude-3-5-sonnet-20240620': 'Claude Sonnet 3.5',
   'claude-3-5-haiku-20241022': 'Claude Haiku 3.5',
-  'claude-3-5-sonnet-20241022': 'Claude Sonnet 3.6',
+  'claude-3-5-sonnet-20241022': 'Claude Sonnet 3.5',
   'claude-3-7-sonnet-20250219': 'Claude Sonnet 3.7',
   'claude-sonnet-4-20250514': 'Claude Sonnet 4',
   'claude-opus-4-20250514': 'Claude Opus 4',
