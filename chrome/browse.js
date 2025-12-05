@@ -637,66 +637,113 @@ async function exportConversation(conversationId, conversationName) {
       const artifactFiles = extractArtifactFiles(data, artifactFormat);
 
       if (artifactFiles.length > 0) {
-        // Create a ZIP with artifacts (and optionally conversation)
-        const zip = new JSZip();
+        // Calculate total files that would be in the export
+        const totalFiles = (includeChats !== false ? 1 : 0) + artifactFiles.length;
 
-        // Add conversation file only if includeChats is true
-        if (includeChats !== false) {
-          let conversationContent, conversationFilename;
-          switch (format) {
-            case 'markdown':
-              conversationContent = convertToMarkdown(data, includeMetadata, conversationId, includeArtifacts, includeThinking);
-              conversationFilename = `${conversationName || conversationId}.md`;
-              break;
-            case 'text':
-              conversationContent = convertToText(data, includeMetadata, includeArtifacts, includeThinking);
-              conversationFilename = `${conversationName || conversationId}.txt`;
-              break;
-            default:
-              conversationContent = JSON.stringify(data, null, 2);
-              conversationFilename = `${conversationName || conversationId}.json`;
-          }
-
-          // Flat export: add to Chats folder
-          if (flattenArtifacts && !extractArtifacts) {
-            const chatsFolder = zip.folder('Chats');
-            chatsFolder.file(conversationFilename, conversationContent);
+        // If only one file, export it directly without ZIP
+        if (totalFiles === 1) {
+          if (includeChats !== false) {
+            // Single chat file, no artifacts to extract
+            let content, filename, type;
+            switch (format) {
+              case 'markdown':
+                content = convertToMarkdown(data, includeMetadata, conversationId, includeArtifacts, includeThinking);
+                filename = `${conversationName || conversationId}.md`;
+                type = 'text/markdown';
+                break;
+              case 'text':
+                content = convertToText(data, includeMetadata, includeArtifacts, includeThinking);
+                filename = `${conversationName || conversationId}.txt`;
+                type = 'text/plain';
+                break;
+              default:
+                content = JSON.stringify(data, null, 2);
+                filename = `${conversationName || conversationId}.json`;
+                type = 'application/json';
+            }
+            downloadFile(content, filename, type);
+            showToast(`Exported: ${conversationName}`);
           } else {
-            // Nested or no artifact extraction: add to root
-            zip.file(conversationFilename, conversationContent);
+            // Single artifact file
+            const artifact = artifactFiles[0];
+            const mimeTypes = {
+              'js': 'text/javascript',
+              'ts': 'text/typescript',
+              'py': 'text/x-python',
+              'html': 'text/html',
+              'css': 'text/css',
+              'json': 'application/json',
+              'md': 'text/markdown',
+              'txt': 'text/plain',
+              'svg': 'image/svg+xml'
+            };
+            const ext = artifact.filename.split('.').pop().toLowerCase();
+            const type = mimeTypes[ext] || 'text/plain';
+            downloadFile(artifact.content, artifact.filename, type);
+            showToast(`Exported: ${artifact.filename}`);
           }
-        }
+        } else {
+          // Multiple files - create a ZIP
+          const zip = new JSZip();
 
-        // Add artifact files
-        // Nested: create artifacts subfolder
-        if (extractArtifacts) {
-          const artifactsFolder = includeChats !== false ? zip.folder('artifacts') : zip;
-          for (const artifact of artifactFiles) {
-            artifactsFolder.file(artifact.filename, artifact.content);
+          // Add conversation file only if includeChats is true
+          if (includeChats !== false) {
+            let conversationContent, conversationFilename;
+            switch (format) {
+              case 'markdown':
+                conversationContent = convertToMarkdown(data, includeMetadata, conversationId, includeArtifacts, includeThinking);
+                conversationFilename = `${conversationName || conversationId}.md`;
+                break;
+              case 'text':
+                conversationContent = convertToText(data, includeMetadata, includeArtifacts, includeThinking);
+                conversationFilename = `${conversationName || conversationId}.txt`;
+                break;
+              default:
+                conversationContent = JSON.stringify(data, null, 2);
+                conversationFilename = `${conversationName || conversationId}.json`;
+            }
+
+            // Flat export: add to Chats folder
+            if (flattenArtifacts && !extractArtifacts) {
+              const chatsFolder = zip.folder('Chats');
+              chatsFolder.file(conversationFilename, conversationContent);
+            } else {
+              // Nested or no artifact extraction: add to root
+              zip.file(conversationFilename, conversationContent);
+            }
           }
-        }
 
-        // Flat: add artifacts with conversation name prefix to Artifacts folder
-        if (flattenArtifacts && !extractArtifacts) {
-          const artifactsFolder = zip.folder('Artifacts');
-          for (const artifact of artifactFiles) {
-            const filename = `${conversationName}_${artifact.filename}`;
-            artifactsFolder.file(filename, artifact.content);
+          // Add artifact files
+          // Nested: create artifacts subfolder
+          if (extractArtifacts) {
+            const artifactsFolder = includeChats !== false ? zip.folder('artifacts') : zip;
+            for (const artifact of artifactFiles) {
+              artifactsFolder.file(artifact.filename, artifact.content);
+            }
           }
+
+          // Flat: add artifacts with conversation name prefix to Artifacts folder
+          if (flattenArtifacts && !extractArtifacts) {
+            const artifactsFolder = zip.folder('Artifacts');
+            for (const artifact of artifactFiles) {
+              const filename = `${conversationName}_${artifact.filename}`;
+              artifactsFolder.file(filename, artifact.content);
+            }
+          }
+
+          // Generate and download ZIP
+          const blob = await zip.generateAsync({ type: 'blob' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${conversationName || conversationId}.zip`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+
+          showToast(`Exported: ${conversationName} with ${artifactFiles.length} artifact(s)`);
         }
-
-        // Generate and download ZIP
-        const blob = await zip.generateAsync({ type: 'blob' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${conversationName || conversationId}.zip`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-
-        showToast(`Exported: ${conversationName} with ${artifactFiles.length} artifact(s)`);
       } else {
         // No artifacts found, export normally
         let content, filename, type;
