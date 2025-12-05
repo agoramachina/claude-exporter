@@ -233,7 +233,38 @@ async function loadConversations() {
 
 // Format model name for display
 function formatModelName(model) {
-  return MODEL_DISPLAY_NAMES[model] || model;
+  // Check explicit mappings first (for known models and edge cases)
+  if (MODEL_DISPLAY_NAMES[model]) {
+    return MODEL_DISPLAY_NAMES[model];
+  }
+
+  // Try to parse unknown models
+  if (!model || !model.startsWith('claude-')) {
+    return model || 'Unknown';
+  }
+
+  // Pattern for new format: claude-{model}-{major}[-{minor}]-{date}
+  // e.g., claude-sonnet-5-20260101 or claude-opus-5-1-20260101
+  const newFormatMatch = model.match(/^claude-(sonnet|opus|haiku)-(\d+)(?:-(\d+))?-\d{8}$/i);
+  if (newFormatMatch) {
+    const [, modelType, major, minor] = newFormatMatch;
+    const modelName = modelType.charAt(0).toUpperCase() + modelType.slice(1);
+    const version = minor ? `${major}.${minor}` : major;
+    return `Claude ${modelName} ${version}`;
+  }
+
+  // Pattern for old format: claude-{major}[-{minor}]-{model}-{date}
+  // e.g., claude-3-sonnet-20240229 or claude-3-5-sonnet-20240620
+  const oldFormatMatch = model.match(/^claude-(\d+)(?:-(\d+))?-(sonnet|opus|haiku)-\d{8}$/i);
+  if (oldFormatMatch) {
+    const [, major, minor, modelType] = oldFormatMatch;
+    const modelName = modelType.charAt(0).toUpperCase() + modelType.slice(1);
+    const version = minor ? `${major}.${minor}` : major;
+    return `Claude ${modelName} ${version}`;
+  }
+
+  // Return original if can't parse
+  return model;
 }
 
 // Get project name for a conversation
