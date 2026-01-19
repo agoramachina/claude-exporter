@@ -133,10 +133,15 @@
 
 ## Bugs 🐛
 
-- **Pasted text attachments missing from export**
-  - Long pasted text that Claude.ai shows as "PASTED" attachment is omitted from exported .md files
-  - Content exists in `attachments[].extracted_content` but export logic doesn't check for it
-  - Fix needed in `utils.js` convertToMarkdown() and convertToText() functions
+- **FIXED: Pasted text attachments missing from export**
+  - ~~Long pasted text that Claude.ai shows as "PASTED" attachment is omitted from exported .md files~~
+  - ~~Content exists in `attachments[].extracted_content` but export logic doesn't check for it~~
+  - Fixed: Now exports pasted content in collapsible `<details>` tags
+
+- **Potential: `</details>` tag in content could break collapsible formatting**
+  - If thinking or pasted content contains literal `</details>` tags, it could break the markdown
+  - Need to sanitize/escape content before wrapping in `<details>` tags
+  - Low priority: edge case, but worth fixing for robustness
 
 ## Current Version: 1.8.5
 
