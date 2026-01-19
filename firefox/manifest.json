@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Claude Exporter",
-  "version": "1.8.5",
+  "version": "1.8.6",
   "description": "Export conversations and artifacts from Claude.ai",
   "permissions": [
     "activeTab",
