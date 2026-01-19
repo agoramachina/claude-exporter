@@ -69,12 +69,7 @@ function convertToMarkdown(data, includeMetadata, conversationId = null, include
       for (const content of message.content) {
         // Handle thinking blocks (extended thinking)
         if (content.type === 'thinking' && content.thinking && includeThinking) {
-          // Get the summary if available
-          const summary = content.summaries && content.summaries.length > 0
-            ? content.summaries[content.summaries.length - 1].summary
-            : 'Thought process';
-
-          markdown += `#### Thinking\n\`\`\`\`plaintext\n${summary}\n\n${content.thinking}\n\`\`\`\`\n\n`;
+          markdown += `### Thinking\n\`\`\`\`plaintext\n${content.thinking}\n\`\`\`\`\n\n`;
         }
         // Handle regular text content (skip tool_use, we handle artifacts separately)
         else if (content.type === 'text' && content.text) {
@@ -90,6 +85,15 @@ function convertToMarkdown(data, includeMetadata, conversationId = null, include
       let textWithoutArtifacts = message.text.replace(/<antArtifact[^>]*>[\s\S]*?<\/antArtifact>/g, '').trim();
       if (textWithoutArtifacts) {
         markdown += `${textWithoutArtifacts}\n\n`;
+      }
+    }
+
+    // Handle attachments (e.g., pasted content)
+    if (message.attachments && message.attachments.length > 0) {
+      for (const attachment of message.attachments) {
+        if (attachment.extracted_content) {
+          markdown += `### Pasted\n\`\`\`\`plaintext\n${attachment.extracted_content}\n\`\`\`\`\n\n`;
+        }
       }
     }
 
@@ -178,9 +182,21 @@ function convertToText(data, includeMetadata, includeArtifacts = true, includeTh
       }
     }
 
+    // Add pasted content if present
+    if (message.attachments && message.attachments.length > 0) {
+      for (const attachment of message.attachments) {
+        if (attachment.extracted_content) {
+          const size = attachment.file_size ? ` (${attachment.file_size} bytes)` : '';
+          text += `\n[Pasted content${size}]\n`;
+          text += `${attachment.extracted_content}\n`;
+          text += `[End Pasted content]\n`;
+        }
+      }
+    }
+
     text += `\n`;
   });
-  
+
   return text.trim();
 }
 
