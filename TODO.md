@@ -110,6 +110,34 @@
   - Support both global/account-level memory and project-specific memory
   - Allow backup and archival of configured AI behavior and context
 
+- **Date/datetime toggle in table**
+  - Click on date in "Updated" or "Created" columns to toggle between date and datetime display
+
+- **Model name/ID toggle in table**
+  - Click on model name to toggle between display name and model ID
+
+- **Track last backup time**
+  - Store download timestamps in `chrome.storage.local` / `browser.storage.local`
+  - Display "Last Backed Up" indicator in table
+  - Optionally highlight chats updated since last backup
+
+- **Google Drive integration**
+  - Link/sync exports to Google Drive
+
+- **Markdown export formatting review**
+  - Consider changing how .md formats Claude's thinking and message blocks
+  - Review overall structure and readability
+
+- **UI cleanup: Remove redundant "View" button**
+  - Chat name already links to conversation, "View" button may be unnecessary
+
+## Bugs 🐛
+
+- **Pasted text attachments missing from export**
+  - Long pasted text that Claude.ai shows as "PASTED" attachment is omitted from exported .md files
+  - Content exists in `attachments[].extracted_content` but export logic doesn't check for it
+  - Fix needed in `utils.js` convertToMarkdown() and convertToText() functions
+
 ## Current Version: 1.8.5
 
 ## Notes
