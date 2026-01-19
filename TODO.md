@@ -132,6 +132,11 @@
 - **UI cleanup: Remove redundant "View" button**
   - Chat name already links to conversation, "View" button may be unnecessary
 
+- **README update: Installation section**
+  - Add links to Chrome Web Store and Firefox Add-ons pages
+  - Rename current Installation section to "Manual Installation"
+  - Extensions now published on both browser stores
+
 ## Bugs 🐛
 
 - **FIXED: Pasted text attachments missing from export**
