@@ -7,7 +7,7 @@ A browser extension for Chrome and Firefox that allows you to export your Claude
 - 📥 **Export Individual Conversations** - Export any conversation directly from Claude.ai
 - 📚 **Bulk Export** - Export all or filtered conversations as a ZIP file
 - 🔍 **Browse & Search** - View all your conversations in a searchable table
-- 🔀 Sort Conversations - Sort by name, date, project, model, and more
+- 🔀 **Sort Conversations** - Sort by name, date, project, model, and more
 - 🌳 **Branch-Aware Export** - Correctly handles conversation branches
 - 📝 **Multiple Formats** - JSON (full data), Markdown, or Plain Text
 - 📦 **Artifact Export** - Extract artifacts (code, documents, etc.) as separate files
@@ -16,12 +16,22 @@ A browser extension for Chrome and Firefox that allows you to export your Claude
 - 🏷️ **Metadata Options** - Include or exclude timestamps, models, and other metadata
 - 🤖 **Complete Model Information** - Preserves and displays model information for all conversations
 - 🔮 **Smart Model Inference** - Automatically infers the correct model for conversations that used the default model at the time
-- ☀️ Light/Dark Mode - Toggle between color schemes
+- ☀️  **Light/Dark Mode** - Toggle between color schemes
 
 ---
-### Installation
+### Installation (Recommended)
+The simplest way to install Claude Exporter and receive automatic updates is through your browser's official Extensions page.
 
-#### Chrome (and Chromium-based browsers)
+#### Chrome and Chromium-based browsers
+Available on the [Chrome Web Store](https://chromewebstore.google.com/detail/claude-exporter/niicpkfpebcmikhdmmjnlamoljlabkni?hl=en)
+
+#### Firefox
+Available as a [Firefox extension](https://addons.mozilla.org/en-US/firefox/addon/claude-exporter/)
+
+---
+### Manual Installation
+
+#### Chrome and Chromium-based browsers
 1. Download the `claude-exporter-chrome-vX.X.X.zip` from the [Releases page](https://github.com/agoramachina/claude-exporter/releases)
 2. Extract the zip into a safe folder (this will be the permanent location - don't move or delete it)
 3. Open Chrome and navigate to `chrome://extensions/`
