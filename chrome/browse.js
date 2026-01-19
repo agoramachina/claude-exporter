@@ -82,11 +82,12 @@ const MODEL_DISPLAY_NAMES = {
   'claude-3-haiku-20240307': 'Claude Haiku 3',
   'claude-3-5-sonnet-20240620': 'Claude Sonnet 3.5',
   'claude-3-5-haiku-20241022': 'Claude Haiku 3.5',
-  'claude-3-5-sonnet-20241022': 'Claude Sonnet 3.6',
+  'claude-3-5-sonnet-20241022': 'Claude Sonnet 3.5',
   'claude-3-7-sonnet-20250219': 'Claude Sonnet 3.7',
   'claude-sonnet-4-20250514': 'Claude Sonnet 4',
   'claude-opus-4-20250514': 'Claude Opus 4',
   'claude-opus-4-1-20250805': 'Claude Opus 4.1',
+  'claude-opus-4-5-20251101': 'Claude Opus 4.5',
   'claude-sonnet-4-5-20250929': 'Claude Sonnet 4.5',
   'claude-haiku-4-5-20251001': 'Claude Haiku 4.5'
 };
@@ -232,7 +233,38 @@ async function loadConversations() {
 
 // Format model name for display
 function formatModelName(model) {
-  return MODEL_DISPLAY_NAMES[model] || model;
+  // Check explicit mappings first (for known models and edge cases)
+  if (MODEL_DISPLAY_NAMES[model]) {
+    return MODEL_DISPLAY_NAMES[model];
+  }
+
+  // Try to parse unknown models
+  if (!model || !model.startsWith('claude-')) {
+    return model || 'Unknown';
+  }
+
+  // Pattern for new format: claude-{model}-{major}[-{minor}]-{date}
+  // e.g., claude-sonnet-5-20260101 or claude-opus-5-1-20260101
+  const newFormatMatch = model.match(/^claude-(sonnet|opus|haiku)-(\d+)(?:-(\d+))?-\d{8}$/i);
+  if (newFormatMatch) {
+    const [, modelType, major, minor] = newFormatMatch;
+    const modelName = modelType.charAt(0).toUpperCase() + modelType.slice(1);
+    const version = minor ? `${major}.${minor}` : major;
+    return `Claude ${modelName} ${version}`;
+  }
+
+  // Pattern for old format: claude-{major}[-{minor}]-{model}-{date}
+  // e.g., claude-3-sonnet-20240229 or claude-3-5-sonnet-20240620
+  const oldFormatMatch = model.match(/^claude-(\d+)(?:-(\d+))?-(sonnet|opus|haiku)-\d{8}$/i);
+  if (oldFormatMatch) {
+    const [, major, minor, modelType] = oldFormatMatch;
+    const modelName = modelType.charAt(0).toUpperCase() + modelType.slice(1);
+    const version = minor ? `${major}.${minor}` : major;
+    return `Claude ${modelName} ${version}`;
+  }
+
+  // Return original if can't parse
+  return model;
 }
 
 // Get project name for a conversation
@@ -372,7 +404,7 @@ function displayConversations() {
         <tr>
           <th class="sortable" data-sort="name">Name${getSortIndicator('name')}</th>
           <th class="sortable" data-sort="project">Project${getSortIndicator('project')}</th>
-          <th class="sortable" data-sort="updated">Last Updated${getSortIndicator('updated')}</th>
+          <th class="sortable" data-sort="updated">Updated${getSortIndicator('updated')}</th>
           <th class="sortable" data-sort="created">Created${getSortIndicator('created')}</th>
           <th class="sortable" data-sort="model">Model${getSortIndicator('model')}</th>
           <th>Actions</th>
