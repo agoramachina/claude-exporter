@@ -19,9 +19,10 @@ A browser extension for Chrome and Firefox that allows you to export your Claude
 - ☀️ Light/Dark Mode - Toggle between color schemes
 
 ---
-### Installation
 
-#### Chrome (and Chromium-based browsers)
+### Manual Installation
+
+#### Chrome and Chromium-based browsers
 1. Download the `claude-exporter-chrome-vX.X.X.zip` from the [Releases page](https://github.com/agoramachina/claude-exporter/releases)
 2. Extract the zip into a safe folder (this will be the permanent location - don't move or delete it)
 3. Open Chrome and navigate to `chrome://extensions/`
