@@ -139,7 +139,7 @@
   - ~~Content exists in `attachments[].extracted_content` but export logic doesn't check for it~~
   - Fixed: Now exports pasted content with `### Pasted` header and quadruple-backtick code block
 
-## Current Version: 1.8.5
+## Current Version: 1.8.6
 
 ## Notes
 
