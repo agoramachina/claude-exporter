@@ -124,9 +124,10 @@
 - **Google Drive integration**
   - Link/sync exports to Google Drive
 
-- **Markdown export formatting review**
-  - Consider changing how .md formats Claude's thinking and message blocks
-  - Review overall structure and readability
+- **DONE: Markdown export formatting review**
+  - ~~Consider changing how .md formats Claude's thinking and message blocks~~
+  - Updated: `### Thinking` and `### Pasted` headers with quadruple-backtick code blocks
+  - Provides clear visual hierarchy (## Speaker → ### Content type)
 
 - **UI cleanup: Remove redundant "View" button**
   - Chat name already links to conversation, "View" button may be unnecessary
@@ -136,12 +137,7 @@
 - **FIXED: Pasted text attachments missing from export**
   - ~~Long pasted text that Claude.ai shows as "PASTED" attachment is omitted from exported .md files~~
   - ~~Content exists in `attachments[].extracted_content` but export logic doesn't check for it~~
-  - Fixed: Now exports pasted content in collapsible `<details>` tags
-
-- **Potential: `</details>` tag in content could break collapsible formatting**
-  - If thinking or pasted content contains literal `</details>` tags, it could break the markdown
-  - Need to sanitize/escape content before wrapping in `<details>` tags
-  - Low priority: edge case, but worth fixing for robustness
+  - Fixed: Now exports pasted content with `### Pasted` header and quadruple-backtick code block
 
 ## Current Version: 1.8.5
 
