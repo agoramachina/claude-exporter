@@ -69,7 +69,7 @@ function convertToMarkdown(data, includeMetadata, conversationId = null, include
       for (const content of message.content) {
         // Handle thinking blocks (extended thinking)
         if (content.type === 'thinking' && content.thinking && includeThinking) {
-          markdown += `### Thinking\n\`\`\`\`plaintext\n${content.thinking}\n\`\`\`\`\n\n`;
+          markdown += `### Thinking\n\`\`\`\`\n${content.thinking}\n\`\`\`\`\n\n`;
         }
         // Handle regular text content (skip tool_use, we handle artifacts separately)
         else if (content.type === 'text' && content.text) {
@@ -92,7 +92,7 @@ function convertToMarkdown(data, includeMetadata, conversationId = null, include
     if (message.attachments && message.attachments.length > 0) {
       for (const attachment of message.attachments) {
         if (attachment.extracted_content) {
-          markdown += `### Pasted\n\`\`\`\`plaintext\n${attachment.extracted_content}\n\`\`\`\`\n\n`;
+          markdown += `### Pasted\n\`\`\`\`\n${attachment.extracted_content}\n\`\`\`\`\n\n`;
         }
       }
     }
