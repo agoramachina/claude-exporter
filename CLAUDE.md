@@ -1,5 +1,11 @@
 # Claude Exporter - Development Guide
 
+## Communication Style
+
+- Narrate what you're doing at each step — brief status updates help the user follow along and make the chat searchable
+- Be patient with tangents and context-switching (ADHD-friendly pacing)
+- Keep explanations concise but don't skip them
+
 ## Self-Maintenance
 
 This file is the shared project memory. **Update it proactively** when:
