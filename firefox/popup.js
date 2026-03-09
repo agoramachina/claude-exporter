@@ -66,7 +66,7 @@ document.getElementById('openOptions').addEventListener('click', (e) => {
     statusEl.className = `status ${type}`;
 
     // Check for 403 errors and add org ID hint with options link
-    if (type === 'error' && message.includes('403')) {
+    if (type === 'error' && message.includes('403') || message.includes('404')) {
       statusEl.innerHTML = `${message}<br><br>This usually means your Organization ID is incorrect or has changed. <a href="#" id="statusOpenOptions">Check your settings</a>`;
       document.getElementById('statusOpenOptions').addEventListener('click', (e) => {
         e.preventDefault();
