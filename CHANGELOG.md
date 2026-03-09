@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.8.10]
+
+- Replaced PNG popup header with CSS gradient header
+- Removed popup-header.png dependency
+- Integrated version display into gradient header
+
 ## [1.8.9]
 
 - Added version number display centered below popup header

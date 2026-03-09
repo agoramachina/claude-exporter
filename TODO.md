@@ -151,7 +151,7 @@
 
 (none currently open)
 
-## Current Version: 1.8.9
+## Current Version: 1.8.10
 
 ## Notes
 
