@@ -10,6 +10,8 @@ This file is the shared project memory. **Update it proactively** when:
 
 Keep it concise. Don't duplicate what's already here — update existing sections instead.
 
+**This file exists in two places:** the workspace root (read by Claude Code) and `src/CLAUDE.md` (tracked in git). When updating, update both copies.
+
 ## Project Structure
 - Extension source and git repo lives in `src/`
 - Parallel Chrome (`src/chrome/`) and Firefox (`src/firefox/`) versions — nearly identical copies
@@ -42,6 +44,20 @@ Keep it concise. Don't duplicate what's already here — update existing section
 - **`src/TODO.md`** — Move completed items to the Completed section, update the current version number, clean up any stale entries
 - **`src/CHANGELOG.md`** — Append a short entry under the current version. Create the file if it doesn't exist. Format: `## [X.Y.Z]` header, then bullet points describing changes
 - Keep both concise — one line per change is fine
+
+## Release Process
+
+**Only create releases when explicitly asked.** Never auto-release.
+
+When the user asks to create a release for version X.Y.Z:
+
+1. **Verify version** — Confirm both `chrome/manifest.json` and `firefox/manifest.json` show the correct version
+2. **Create release directory** — `mkdir -p releases/vX.Y.Z`
+3. **ZIP Chrome extension** — `cd src/chrome && zip -r ../../releases/vX.Y.Z/claude-exporter-chrome.zip ./*`
+4. **ZIP Firefox extension** — `cd src/firefox && zip -r ../../releases/vX.Y.Z/claude-exporter-firefox.zip ./*` (unsigned; user handles .xpi signing via AMO)
+5. **Git tag** — `cd src && git tag vX.Y.Z -m "Release vX.Y.Z"`
+6. **Push tag** — `git push origin vX.Y.Z`
+7. **Create GitHub release** — `gh release create vX.Y.Z ../releases/vX.Y.Z/* --title "vX.Y.Z" --notes "$(changelog excerpt from CHANGELOG.md)"`
 
 ## Critical Rules
 
