@@ -1,4 +1,5 @@
 .claude
 .vscode
+node_modules/
 package.json
-package-lock.jso
+package-lock.json
