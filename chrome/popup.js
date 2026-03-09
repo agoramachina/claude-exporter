@@ -64,8 +64,18 @@ document.getElementById('openOptions').addEventListener('click', (e) => {
   function showStatus(message, type = 'info') {
     const statusEl = document.getElementById('status');
     statusEl.className = `status ${type}`;
-    statusEl.textContent = message;
-    
+
+    // Check for 403 errors and add org ID hint with options link
+    if (type === 'error' && message.includes('403')) {
+      statusEl.innerHTML = `${message}<br><br>This usually means your Organization ID is incorrect or has changed. <a href="#" id="statusOpenOptions">Check your settings</a>`;
+      document.getElementById('statusOpenOptions').addEventListener('click', (e) => {
+        e.preventDefault();
+        chrome.runtime.openOptionsPage();
+      });
+    } else {
+      statusEl.textContent = message;
+    }
+
     if (type === 'success') {
       setTimeout(() => {
         statusEl.textContent = '';
