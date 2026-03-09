@@ -16,7 +16,8 @@ A browser extension for Chrome and Firefox that allows you to export your Claude
 - 🏷️ **Metadata Options** - Include or exclude timestamps, models, and other metadata
 - 🤖 **Complete Model Information** - Preserves and displays model information for all conversations
 - 🔮 **Smart Model Inference** - Automatically infers the correct model for conversations that used the default model at the time
-- ☀️  **Light/Dark Mode** - Toggle between color schemes
+- 🔒 **Secure** - All data processing happens in your browser and is never sent anywhere
+- ☀️ **Light/Dark Mode** - Toggle between color schemes
 
 ---
 ### Installation (Recommended)
