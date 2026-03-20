@@ -89,18 +89,18 @@
   - background.js re-injects all three content scripts on reload (fixes "not defined" errors)
   - Removed stale export_summary.json toast reference
 
+- **Automatic organization ID detection** (v1.8.12)
+  - Auto-detects org ID from Claude.ai API on every export action (always fresh)
+  - Eliminates manual configuration step for most users
+  - Falls back to stored org ID if auto-detect fails
+  - Fixes issue where manually-set org ID becomes stale
+
 ## Pending 🔄
 
-- **Automatic organization ID detection**
-  - Auto-detect org ID from Claude.ai API on every export action (always fresh)
-  - Eliminate manual configuration step
-  - Fallback to manual configuration if auto-detection fails
-  - Note: Org ID is NOT static — users get confused when manually-set ID stops working
-
 - **Settings button in popup**
-  - Add a settings/gear button to the popup UI
+  - Add a settings/gear button to the popup UI (repurpose theme toggle area)
   - Opens options page for configuring org ID (manual override)
-  - Should be accessible but not required once auto-detection works
+  - Should be accessible but not required since auto-detection works
 
 - **Test connection button in popup**
   - Quick connection test from the popup (not just the options page)
@@ -162,7 +162,7 @@
 
 (none currently open)
 
-## Current Version: 1.8.11
+## Current Version: 1.8.12
 
 ## Notes
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.12]
+
+- Auto-detect organization ID from Claude.ai API on every export action
+- No more stale org ID issues when users switch organizations
+- Falls back to manually configured org ID if auto-detect fails
+- Export buttons no longer disabled on popup load
+
 ## [1.8.11]
 
 - 403/404 errors now show a helpful message with a link to org ID settings
