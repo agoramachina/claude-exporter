@@ -318,7 +318,7 @@
 
     thead {
       background: var(--secondary-bg);
-      border-bottom: 2px solid var(--border-color);
+      border-bottom: 3px solid var(--bg-body);
     }
 
     th {
@@ -423,19 +423,92 @@
       text-decoration: underline;
     }
 
-    .status-filter {
+    .search-group {
       display: flex;
       align-items: center;
+      gap: 8px;
+      flex-grow: 1;
+      max-width: 540px;
     }
 
-    .status-filter select {
-      padding: 6px 10px;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      background: var(--bg-body);
-      color: var(--text-primary);
-      font-size: 13px;
+    .search-group .search-box {
+      max-width: none;
+    }
+
+    .filter-wrapper {
+      position: relative;
+    }
+
+    .filter-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--input-border);
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .filter-btn:hover {
+      color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+
+    .filter-btn.active {
+      color: var(--primary-color);
+      border-color: var(--primary-color);
+      background: var(--secondary-bg);
+    }
+
+    .filter-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #22c55e;
+      border: 2px solid var(--bg-card);
+    }
+
+    .filter-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 4px);
+      right: 0;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: 0 4px 16px var(--shadow-md);
+      min-width: 200px;
+      z-index: 1000;
+      padding: 4px 0;
+    }
+
+    .filter-dropdown.open {
+      display: block;
+    }
+
+    .filter-option {
+      padding: 10px 16px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text-primary);
+      transition: background 0.15s;
+    }
+
+    .filter-option:hover {
+      background: var(--secondary-bg);
+    }
+
+    .filter-option.selected {
+      color: var(--primary-color);
+      font-weight: 600;
     }
 
     .date {
@@ -664,17 +737,24 @@
     </div>
 
     <div class="controls">
-      <div class="search-box" id="searchBox">
-        <input type="text" id="searchInput" placeholder="Search conversations by name...">
-        <button class="clear-btn" id="clearSearch">✕</button>
-      </div>
-
-      <div class="status-filter">
-        <select id="statusFilter">
-          <option value="all">All conversations</option>
-          <option value="new">New / Updated</option>
-          <option value="exported">Previously exported</option>
-        </select>
+      <div class="search-group">
+        <div class="search-box" id="searchBox">
+          <input type="text" id="searchInput" placeholder="Search conversations by name...">
+          <button class="clear-btn" id="clearSearch">✕</button>
+        </div>
+        <div class="filter-wrapper">
+          <button class="filter-btn" id="filterBtn" title="Filter conversations">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" width="18" height="18">
+              <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>
+            </svg>
+            <span class="filter-badge" id="filterBadge" style="display:none"></span>
+          </button>
+          <div class="filter-dropdown" id="filterDropdown">
+            <div class="filter-option" data-value="all">All conversations</div>
+            <div class="filter-option" data-value="new">New / Updated</div>
+            <div class="filter-option" data-value="exported">Previously exported</div>
+          </div>
+        </div>
       </div>
 
       <div class="export-controls-wrapper">

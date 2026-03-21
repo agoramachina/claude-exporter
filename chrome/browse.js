@@ -106,8 +106,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (loadingText) loadingText.textContent = 'Loading conversations...';
   await loadConversations();
   setupEventListeners();
-  // Auto-select new/updated conversations on load
-  autoSelectNewUpdated();
 });
 
 // Infer model for conversations with null model based on date
@@ -1172,11 +1170,39 @@ function setupEventListeners() {
     applyFiltersAndSort();
   });
 
-  // Status filter
-  document.getElementById('statusFilter').addEventListener('change', (e) => {
-    statusFilter = e.target.value;
-    applyFiltersAndSort();
+  // Filter dropdown
+  const filterBtn = document.getElementById('filterBtn');
+  const filterDropdown = document.getElementById('filterDropdown');
+  const filterBadge = document.getElementById('filterBadge');
+
+  filterBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    filterDropdown.classList.toggle('open');
   });
+
+  document.addEventListener('click', () => {
+    filterDropdown.classList.remove('open');
+  });
+  filterDropdown.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+
+  document.querySelectorAll('.filter-option').forEach(option => {
+    option.addEventListener('click', () => {
+      statusFilter = option.dataset.value;
+      // Update selected state
+      document.querySelectorAll('.filter-option').forEach(o => o.classList.remove('selected'));
+      option.classList.add('selected');
+      // Update button state
+      filterBtn.classList.toggle('active', statusFilter !== 'all');
+      filterBadge.style.display = statusFilter !== 'all' ? 'block' : 'none';
+      filterDropdown.classList.remove('open');
+      applyFiltersAndSort();
+    });
+  });
+
+  // Set initial selected state
+  document.querySelector('.filter-option[data-value="all"]').classList.add('selected');
 
   // Export all button
   document.getElementById('exportAllBtn').addEventListener('click', exportAllFiltered);

@@ -164,6 +164,9 @@
   - Consider: incremental sync (only export changed conversations) vs full re-export
 
 
+- **Click org ID to copy to clipboard**
+  - In settings dropdown, clicking org ID copies it with visual feedback (tooltip/toast)
+
 - **Improve model badge color contrast in light mode** (low priority)
   - Model name badges (Sonnet/Opus/Haiku) may be hard to read in light theme
   - Increase text/background contrast for accessibility
