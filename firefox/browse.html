@@ -465,17 +465,6 @@
       background: var(--secondary-bg);
     }
 
-    .filter-badge {
-      position: absolute;
-      top: -2px;
-      right: -2px;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #22c55e;
-      border: 2px solid var(--bg-card);
-    }
-
     .filter-dropdown {
       display: none;
       position: absolute;
@@ -738,22 +727,21 @@
 
     <div class="controls">
       <div class="search-group">
-        <div class="search-box" id="searchBox">
-          <input type="text" id="searchInput" placeholder="Search conversations by name...">
-          <button class="clear-btn" id="clearSearch">✕</button>
-        </div>
         <div class="filter-wrapper">
           <button class="filter-btn" id="filterBtn" title="Filter conversations">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" width="18" height="18">
               <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>
             </svg>
-            <span class="filter-badge" id="filterBadge" style="display:none"></span>
           </button>
           <div class="filter-dropdown" id="filterDropdown">
             <div class="filter-option" data-value="all">All conversations</div>
             <div class="filter-option" data-value="new">New / Updated</div>
             <div class="filter-option" data-value="exported">Previously exported</div>
           </div>
+        </div>
+        <div class="search-box" id="searchBox">
+          <input type="text" id="searchInput" placeholder="Search conversations by name...">
+          <button class="clear-btn" id="clearSearch">✕</button>
         </div>
       </div>
 

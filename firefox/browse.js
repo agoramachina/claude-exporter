@@ -1172,7 +1172,6 @@ function setupEventListeners() {
   // Filter dropdown
   const filterBtn = document.getElementById('filterBtn');
   const filterDropdown = document.getElementById('filterDropdown');
-  const filterBadge = document.getElementById('filterBadge');
 
   filterBtn.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -1194,7 +1193,6 @@ function setupEventListeners() {
       option.classList.add('selected');
       // Update button state
       filterBtn.classList.toggle('active', statusFilter !== 'all');
-      filterBadge.style.display = statusFilter !== 'all' ? 'block' : 'none';
       filterDropdown.classList.remove('open');
       applyFiltersAndSort();
     });
