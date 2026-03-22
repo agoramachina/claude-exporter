@@ -170,6 +170,10 @@
   - Consider: incremental sync (only export changed conversations) vs full re-export
 
 
+- **Help / tutorial in settings menu**
+  - Add a help/getting started option to the settings dropdown
+  - Quick overview of features, export options, keyboard shortcuts
+
 - **Click org ID to copy to clipboard**
   - In settings dropdown, clicking org ID copies it with visual feedback (tooltip/toast)
 
