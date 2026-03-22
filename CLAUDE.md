@@ -5,6 +5,7 @@
 - Narrate what you're doing at each step — brief status updates help the user follow along and make the chat searchable
 - Be patient with tangents and context-switching (ADHD-friendly pacing)
 - Keep explanations concise but don't skip them
+- **Scope guard:** Gently remind the user when a tangent is pulling away from the current task. User tends to spiral into feature ideas mid-implementation — help stay focused on finishing the current thing before starting the next. A quick "want to add that to TODO and finish X first?" goes a long way.
 
 ## Self-Maintenance
 

@@ -142,11 +142,18 @@
   - Support both global/account-level memory and project-specific memory
   - Allow backup and archival of configured AI behavior and context
 
-- **Date/datetime toggle in table**
-  - Click on date in "Updated" or "Created" columns to toggle between date and datetime display
+- **Date/time display options** (settings)
+  - Toggle time display on/off below date
+  - Date format option: M/D/Y or D/M/Y
+  - 12-hour or 24-hour time
+  - Advanced: custom format string (e.g. `%d/%m/%Y %H:%M`)
 
 - **Model name/ID toggle in table**
   - Click on model name to toggle between display name and model ID
+
+- **Regex search**
+  - Option to use regex patterns in the search bar
+  - Toggle between plain text and regex mode
 
 - **Google Drive integration**
   - Link/sync exports to Google Drive

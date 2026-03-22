@@ -431,8 +431,12 @@ function displayConversations() {
   `;
   
   filteredConversations.forEach((conv, index) => {
-    const updatedDate = new Date(conv.updated_at).toLocaleDateString();
-    const createdDate = new Date(conv.created_at).toLocaleDateString();
+    const updatedDt = new Date(conv.updated_at);
+    const createdDt = new Date(conv.created_at);
+    const updatedDate = updatedDt.toLocaleDateString();
+    const updatedTime = updatedDt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const createdDate = createdDt.toLocaleDateString();
+    const createdTime = createdDt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const modelBadgeClass = getModelBadgeClass(conv.model);
     const projectName = getProjectName(conv);
 
@@ -448,8 +452,8 @@ function displayConversations() {
           </div>
         </td>
         <td>${escapeHtml(projectName)}</td>
-        <td class="date">${escapeHtml(updatedDate)}</td>
-        <td class="date">${escapeHtml(createdDate)}</td>
+        <td class="date">${escapeHtml(updatedDate)}<br><span class="time">${escapeHtml(updatedTime)}</span></td>
+        <td class="date">${escapeHtml(createdDate)}<br><span class="time">${escapeHtml(createdTime)}</span></td>
         <td>
           <span class="model-badge ${modelBadgeClass}">
             ${escapeHtml(formatModelName(conv.model))}
