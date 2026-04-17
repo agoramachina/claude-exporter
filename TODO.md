@@ -108,6 +108,14 @@
 
 ## Pending 🔄
 
+- **In-popup changelog / "What's new"**
+  - Show users a summary of changes on version bump
+  - Surfaces UI updates so changes aren't jarring
+
+- **Contact link**
+  - Add a way for users to reach out (feedback, bug reports)
+  - Could live in popup or settings dropdown
+
 - **Branch export options**
   - Add option to export all branches vs. only current branch
   - Currently markdown/text only export current branch, JSON exports all
