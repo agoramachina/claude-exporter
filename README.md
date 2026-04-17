@@ -22,11 +22,7 @@ A browser extension for Chrome and Firefox that allows you to export your Claude
 ---
 ### Installation
 
-Install from:
-- [Chrome Web Store](https://chromewebstore.google.com/detail/claude-exporter/niicpkfpebcmikhdmmjnlamoljlabkni?hl=en)
-- [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/claude-exporter/)
-
-For manual installation, installing from source, or troubleshooting, see [INSTALL.md](INSTALL.md).
+See [INSTALL.md](INSTALL.md) for installation instructions (browser stores, manual, and from source).
 
 ---
 ### Usage

@@ -2,7 +2,20 @@
 
 Complete installation instructions for Claude Exporter on Chrome and Firefox.
 
-## Quick Install (Recommended)
+## Install from Browser Store (Recommended)
+
+The simplest way to install Claude Exporter and receive automatic updates:
+
+- **Chrome/Chromium-based browsers:** [Chrome Web Store](https://chromewebstore.google.com/detail/claude-exporter/niicpkfpebcmikhdmmjnlamoljlabkni?hl=en)
+- **Firefox:** [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/claude-exporter/)
+
+After installing, proceed to [Configuration](#configuration).
+
+---
+
+## Install from Releases (.zip / .xpi)
+
+For users who want to install manually without the browser stores.
 
 ### Chrome (and Chromium-based browsers)
 
