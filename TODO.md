@@ -108,13 +108,13 @@
 
 ## Pending 🔄
 
-- **In-popup changelog / "What's new"**
+- **Contact dev / feedback link** (medium priority)
+  - Add to settings dropdown on browse page
+  - Way for users to reach out (feedback, bug reports)
+
+- **In-popup changelog / "What's new"** (low priority)
   - Show users a summary of changes on version bump
   - Surfaces UI updates so changes aren't jarring
-
-- **Contact link**
-  - Add a way for users to reach out (feedback, bug reports)
-  - Could live in popup or settings dropdown
 
 - **Branch export options**
   - Add option to export all branches vs. only current branch
