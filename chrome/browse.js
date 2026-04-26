@@ -882,7 +882,8 @@ async function exportAllFiltered() {
   const cancelButton = document.getElementById('cancelExport');
   cancelButton.onclick = () => {
     cancelExport = true;
-    progressText.textContent = 'Cancelling...';
+    progressModal.style.display = 'none';
+    showToast('Export cancelled', true);
   };
 
   try {
@@ -1013,11 +1014,7 @@ async function exportAllFiltered() {
       }
     }
     
-    if (cancelExport) {
-      progressModal.style.display = 'none';
-      showToast('Export cancelled', true);
-      return;
-    }
+    if (cancelExport) return;
 
     // Generate and download the ZIP file
     progressText.textContent = 'Creating ZIP file...';
