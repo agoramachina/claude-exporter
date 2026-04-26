@@ -28,6 +28,10 @@
       --progress-bg: #e0e0e0;
       --cancel-btn: #dc3545;
       --link-hover: #5436DA;
+      --badge-default: #1d4ed8;
+      --badge-sonnet: #b45309;
+      --badge-haiku: #15803d;
+      --badge-opus: #7c3aed;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -55,6 +59,10 @@
         --progress-bg: #3a3a3a;
         --cancel-btn: #e74c3c;
         --link-hover: #8b7aff;
+        --badge-default: #7ab8f5;
+        --badge-sonnet: #ffaa66;
+        --badge-haiku: #66cc66;
+        --badge-opus: #c084cc;
       }
     }
 
@@ -82,6 +90,10 @@
       --progress-bg: #3a3a3a;
       --cancel-btn: #e74c3c;
       --link-hover: #8b7aff;
+      --badge-default: #7ab8f5;
+      --badge-sonnet: #ffaa66;
+      --badge-haiku: #66cc66;
+      --badge-opus: #c084cc;
     }
 
     * {
@@ -517,20 +529,20 @@
       font-size: 12px;
       font-weight: 500;
       background: transparent;
-      color: #7ab8f5;
+      color: var(--badge-default);
       white-space: nowrap;
     }
 
     .model-badge.sonnet {
-      color: #ffaa66;
+      color: var(--badge-sonnet);
     }
 
     .model-badge.haiku {
-      color: #66cc66;
+      color: var(--badge-haiku);
     }
 
     .model-badge.opus {
-      color: #c084cc;
+      color: var(--badge-opus);
     }
     
     .actions {
@@ -575,6 +587,7 @@
     .btn-view {
       background: var(--secondary-bg);
       color: var(--text-primary);
+      border: 1px solid var(--border-color);
     }
 
     .btn-view:hover {
