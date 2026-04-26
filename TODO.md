@@ -126,6 +126,9 @@
 
 ### Medium Priority 🟡
 
+- **UI cleanup: Remove redundant "View" button**
+  - Chat name already links to conversation, "View" button may be unnecessary
+
 - **Artifact indicators in browse table**
   - Show icon next to conversation name if it contains artifacts
   - Add filter options in funnel dropdown: with artifacts / without artifacts
