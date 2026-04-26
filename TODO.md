@@ -120,14 +120,34 @@
 
 ### High Priority 🟠
 
-- **Improve model badge color contrast in light mode**
-  - Model name badges (Sonnet/Opus/Haiku) may be hard to read in light theme
-  - Increase text/background contrast for accessibility
+- **Track model changes per conversation**
+  - `conversation.model` from the API is the *current* model only — when chats get bounced (deprecation, guardrails kicking to Sonnet 4, etc.) the original model is lost
+  - Symptom: chats created before Sonnet 4.5 existed now show "Sonnet 4.5" because that's their current default
+  - **API does NOT preserve per-message model data** — confirmed by inspecting an exported JSON; messages have no `model` field. Anthropic doesn't track this server-side (in this endpoint at least).
+  - Approach: snapshot tracking on our side
+    - On every export, record `{conversationId, model, timestamp}` to `chrome.storage.local`
+    - First export of a chat = first known model (call it "first-seen" not "created with" — we can't know the real original for chats that pre-date this feature)
+    - On subsequent exports, if `model` changed since last entry, append a new history entry
+    - Include this history array in JSON exports (sidecar or inline field)
+  - Limitations
+    - For chats that existed before tracking starts, original model is unknowable — fall back to date-inference via `DEFAULT_MODEL_TIMELINE` and label it "inferred"
+    - Misses bounces that happen between two exports of the same chat
+  - UI plan
+    - Phase 1: just record the data + show "first-seen" and "current" models in JSON export
+    - Phase 2 (later): two sortable columns in browse table; for now sort by current model only
+  - Note: `DEFAULT_MODEL_TIMELINE` is duplicated in [browse.js](chrome/browse.js) and [content.js](chrome/content.js) — keep in sync
+
+- **Light theme overhaul**
+  - Whole light theme needs work — readability, contrast, color choices across the board
+  - Subsumes the existing "model badge color contrast" issue (Sonnet/Opus/Haiku badges hard to read in light mode)
+  - Audit every component (popup, browse, options, settings dropdown, modals, toasts) against the dark theme as the reference
+  - Consider whether to design light from scratch rather than tweak — current colors feel like dark-mode values dropped onto a light background
 
 ### Medium Priority 🟡
 
 - **UI cleanup: Remove redundant "View" button**
   - Chat name already links to conversation, "View" button may be unnecessary
+  - Frees up that table cell for future artifact-indicator badges
 
 - **Artifact indicators in browse table**
   - Show icon next to conversation name if it contains artifacts
