@@ -845,6 +845,16 @@ async function exportAllFiltered() {
     conversationsToExport = filteredConversations;
   }
 
+  // Single conversation: delegate to exportConversation so we skip the ZIP
+  // when the output is a single file (artifact-extraction paths still ZIP there)
+  if (conversationsToExport.length === 1) {
+    button.disabled = false;
+    button.textContent = originalButtonText;
+    const conv = conversationsToExport[0];
+    await exportConversation(conv.uuid, conv.name);
+    return;
+  }
+
   // Show progress modal
   const progressModal = document.getElementById('progressModal');
   const progressBar = document.getElementById('progressBar');
