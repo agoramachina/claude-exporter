@@ -819,6 +819,325 @@ async function exportConversation(conversationId, conversationName) {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────
+// Project Export — bundle a Claude.ai project into a Claude Code-ready workspace
+// ─────────────────────────────────────────────────────────────────────────
+
+function sanitizeFilename(name) {
+  return (name || 'untitled').replace(/[<>:"/\\|?*\x00-\x1f]/g, '_').trim() || 'untitled';
+}
+
+// Ensure a filename has a sensible extension; default to .md
+function ensureExtension(filename, defaultExt = '.md') {
+  if (!filename) return `untitled${defaultExt}`;
+  return /\.[a-z0-9]{1,8}$/i.test(filename) ? filename : `${filename}${defaultExt}`;
+}
+
+async function fetchProjectDetail(projectId) {
+  const url = `https://claude.ai/api/organizations/${orgId}/projects/${projectId}`;
+  const res = await fetch(url, { credentials: 'include', headers: { 'Accept': 'application/json' } });
+  if (!res.ok) throw new Error(`Project detail fetch failed: HTTP ${res.status}`);
+  return res.json();
+}
+
+async function fetchProjectDocs(projectId) {
+  const url = `https://claude.ai/api/organizations/${orgId}/projects/${projectId}/docs`;
+  const res = await fetch(url, { credentials: 'include', headers: { 'Accept': 'application/json' } });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+async function fetchProjectFiles(projectId) {
+  const url = `https://claude.ai/api/organizations/${orgId}/projects/${projectId}/files`;
+  const res = await fetch(url, { credentials: 'include', headers: { 'Accept': 'application/json' } });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+function buildClaudeMd(project, chats, knowledgeEntries, fileEntries, artifactEntries) {
+  const lines = [];
+  lines.push(`# Project Context: ${project.name || 'Untitled'}`);
+  lines.push('');
+  lines.push(`Exported from Claude.ai on ${new Date().toLocaleString()}.`);
+  lines.push('');
+
+  const promptTpl = (project.prompt_template || '').trim();
+  if (promptTpl) {
+    lines.push('## Custom Instructions');
+    lines.push('');
+    lines.push(promptTpl);
+    lines.push('');
+  }
+
+  const desc = (project.description || '').trim();
+  if (desc) {
+    lines.push('## Description');
+    lines.push('');
+    lines.push(desc);
+    lines.push('');
+  }
+
+  lines.push('## Conversations');
+  lines.push('');
+  if (chats.length === 0) {
+    lines.push('_No conversations in this project._');
+  } else {
+    lines.push(`See \`@context/chats/\` for ${chats.length} conversation${chats.length === 1 ? '' : 's'} in this project.`);
+  }
+  lines.push('');
+
+  if (knowledgeEntries.length > 0 || fileEntries.length > 0) {
+    lines.push('## Knowledge Files');
+    lines.push('');
+    for (const entry of knowledgeEntries) {
+      lines.push(`- @context/knowledge/${entry.savedFilename}`);
+    }
+    for (const entry of fileEntries) {
+      lines.push(`- @context/knowledge/${entry.savedFilename} _(binary upload — metadata only; content not exported)_`);
+    }
+    lines.push('');
+  }
+
+  if (artifactEntries.length > 0) {
+    lines.push('## Artifacts');
+    lines.push('');
+    for (const entry of artifactEntries) {
+      lines.push(`- @context/artifacts/${entry.savedFilename}`);
+    }
+    lines.push('');
+  }
+
+  return lines.join('\n');
+}
+
+function buildFilesManifest(files) {
+  const lines = [];
+  lines.push('# Project Files (binary uploads)');
+  lines.push('');
+  lines.push('Claude.ai stores these uploads as binary blobs that are not exposed for direct download via the public API. Only metadata is captured below.');
+  lines.push('');
+  for (const f of files) {
+    const name = f.file_name || f.name || '(unnamed)';
+    const size = f.size_bytes != null ? `${f.size_bytes} bytes` : 'unknown size';
+    const id = f.file_uuid || f.uuid || '';
+    lines.push(`- **${name}** — ${size}${id ? ` — \`${id}\`` : ''}`);
+  }
+  lines.push('');
+  return lines.join('\n');
+}
+
+async function exportProject(projectId, projectName) {
+  const button = document.getElementById('exportProjectBtn');
+  button.disabled = true;
+
+  const progressModal = document.getElementById('progressModal');
+  const progressBar = document.getElementById('progressBar');
+  const progressText = document.getElementById('progressText');
+  const progressStats = document.getElementById('progressStats');
+  progressBar.style.width = '0%';
+  progressStats.textContent = '';
+  progressText.textContent = `Loading project "${projectName}"...`;
+  progressModal.style.display = 'block';
+
+  let cancelled = false;
+  const cancelBtn = document.getElementById('cancelExport');
+  cancelBtn.onclick = () => { cancelled = true; progressModal.style.display = 'none'; showToast('Project export cancelled', true); };
+
+  try {
+    // 1. Fetch project detail + docs + files in parallel
+    const [project, docs, files] = await Promise.all([
+      fetchProjectDetail(projectId),
+      fetchProjectDocs(projectId),
+      fetchProjectFiles(projectId),
+    ]);
+    if (cancelled) return;
+
+    // 2. Find conversations belonging to this project
+    const projectChats = allConversations.filter(c => {
+      const id = c.project_uuid || c.project_id || c.projectUuid;
+      return id === projectId;
+    });
+
+    const safeProjectName = sanitizeFilename(project.name || projectName);
+    const zip = new JSZip();
+    const root = zip.folder(safeProjectName);
+    const chatsFolder = root.folder('context').folder('chats');
+    const artifactsFolder = root.folder('context').folder('artifacts');
+    const knowledgeFolder = root.folder('context').folder('knowledge');
+
+    // 3. Write knowledge docs (parsed text — saved as-is)
+    const knowledgeEntries = [];
+    const knowledgeUsedNames = new Set();
+    for (const doc of docs) {
+      const baseName = ensureExtension(sanitizeFilename(doc.file_name || doc.uuid || 'doc'), '.md');
+      const savedFilename = dedupeName(baseName, knowledgeUsedNames);
+      knowledgeFolder.file(savedFilename, doc.content || '');
+      knowledgeEntries.push({ savedFilename });
+    }
+
+    // 4. Write files manifest if any binary uploads
+    const fileEntries = [];
+    if (Array.isArray(files) && files.length > 0) {
+      const manifestName = dedupeName('_files_manifest.md', knowledgeUsedNames);
+      knowledgeFolder.file(manifestName, buildFilesManifest(files));
+      // List each binary in CLAUDE.md as an "unexported" entry, but only one manifest file on disk
+      for (const f of files) {
+        fileEntries.push({ savedFilename: `${manifestName} → ${f.file_name || f.uuid}` });
+      }
+    }
+
+    // 5. Fetch each chat in batches, convert to markdown, extract artifacts
+    progressText.textContent = `Exporting ${projectChats.length} conversation${projectChats.length === 1 ? '' : 's'}...`;
+    const chatUsedNames = new Set();
+    const artifactUsedNames = new Set();
+    const artifactEntries = [];
+    const exportedChatIds = [];
+    let processed = 0;
+    const failedChats = [];
+
+    const batchSize = 3;
+    for (let i = 0; i < projectChats.length; i += batchSize) {
+      if (cancelled) return;
+      const batch = projectChats.slice(i, i + batchSize);
+      await Promise.all(batch.map(async (conv) => {
+        try {
+          const res = await fetch(
+            `https://claude.ai/api/organizations/${orgId}/chat_conversations/${conv.uuid}?tree=True&rendering_mode=messages&render_all_tools=true`,
+            { credentials: 'include', headers: { 'Accept': 'application/json' } }
+          );
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+          data.model = inferModel(data);
+
+          const safeChatBase = sanitizeFilename(conv.name || conv.uuid);
+          const chatFilename = dedupeName(`${safeChatBase}.md`, chatUsedNames);
+          // includeMetadata=true, includeArtifacts=false (artifacts separated), includeThinking=true
+          const md = convertToMarkdown(data, true, conv.uuid, false, true);
+          chatsFolder.file(chatFilename, md);
+
+          // Extract artifacts and prefix with chat name to avoid collisions
+          const artifacts = extractArtifactFiles(data, 'original');
+          for (const a of artifacts) {
+            const prefixed = `${safeChatBase}_${a.filename}`;
+            const saved = dedupeName(prefixed, artifactUsedNames);
+            artifactsFolder.file(saved, a.content);
+            artifactEntries.push({ savedFilename: saved });
+          }
+
+          exportedChatIds.push(conv.uuid);
+        } catch (e) {
+          console.error(`Chat ${conv.uuid} failed:`, e);
+          failedChats.push(conv.name || conv.uuid);
+        }
+      }));
+
+      processed += batch.length;
+      progressBar.style.width = `${Math.round((processed / Math.max(projectChats.length, 1)) * 100)}%`;
+      progressStats.textContent = `${processed}/${projectChats.length} processed${failedChats.length ? ` (${failedChats.length} failed)` : ''}`;
+      if (i + batchSize < projectChats.length && !cancelled) {
+        await new Promise(r => setTimeout(r, 200));
+      }
+    }
+
+    if (cancelled) return;
+
+    // 6. Write CLAUDE.md
+    const claudeMd = buildClaudeMd(project, projectChats, knowledgeEntries, fileEntries, artifactEntries);
+    root.file('CLAUDE.md', claudeMd);
+
+    // 7. Generate and download
+    progressText.textContent = 'Building ZIP...';
+    const blob = await zip.generateAsync(
+      { type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } },
+      (m) => { progressBar.style.width = `${Math.round(m.percent)}%`; }
+    );
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `claude-project-${safeProjectName}-${getLocalDateTimeString()}.zip`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    progressModal.style.display = 'none';
+    if (exportedChatIds.length > 0) await saveExportTimestamps(exportedChatIds);
+    displayConversations();
+    updateStats();
+
+    if (failedChats.length > 0) {
+      showToast(`Exported project (${exportedChatIds.length} chats, ${failedChats.length} failed)`);
+    } else {
+      showToast(`Exported project "${project.name || projectName}" (${exportedChatIds.length} chats, ${knowledgeEntries.length} docs, ${artifactEntries.length} artifacts)`);
+    }
+  } catch (e) {
+    console.error('Project export error:', e);
+    progressModal.style.display = 'none';
+    showToast(`Project export failed: ${e.message}`, true);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+// Append _2, _3 ... if filename already used; mutates the used set
+function dedupeName(name, usedSet) {
+  if (!usedSet.has(name)) { usedSet.add(name); return name; }
+  const dot = name.lastIndexOf('.');
+  const base = dot > 0 ? name.slice(0, dot) : name;
+  const ext = dot > 0 ? name.slice(dot) : '';
+  let i = 2;
+  while (usedSet.has(`${base}_${i}${ext}`)) i++;
+  const out = `${base}_${i}${ext}`;
+  usedSet.add(out);
+  return out;
+}
+
+function populateProjectDropdown() {
+  const dropdown = document.getElementById('projectDropdown');
+  const button = document.getElementById('exportProjectBtn');
+  if (!dropdown || !button) return;
+
+  if (!allProjects || allProjects.length === 0) {
+    dropdown.innerHTML = '<div class="project-dropdown-empty">No projects found</div>';
+    button.disabled = true;
+    return;
+  }
+
+  // Sort projects alphabetically and count conversations per project
+  const counts = {};
+  for (const conv of allConversations) {
+    const pid = conv.project_uuid || conv.project_id || conv.projectUuid;
+    if (pid) counts[pid] = (counts[pid] || 0) + 1;
+  }
+
+  const sorted = [...allProjects].sort((a, b) => {
+    const an = (a.name || a.title || '').toLowerCase();
+    const bn = (b.name || b.title || '').toLowerCase();
+    return an.localeCompare(bn);
+  });
+
+  dropdown.innerHTML = sorted.map(p => {
+    const pid = p.uuid || p.id;
+    const pname = p.name || p.title || 'Untitled Project';
+    const count = counts[pid] || 0;
+    return `<div class="project-option" data-project-id="${escapeHtml(pid)}" data-project-name="${escapeHtml(pname)}">
+      ${escapeHtml(pname)}
+      <span class="project-meta">${count} conversation${count === 1 ? '' : 's'}</span>
+    </div>`;
+  }).join('');
+
+  dropdown.querySelectorAll('.project-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      const pid = opt.dataset.projectId;
+      const pname = opt.dataset.projectName;
+      dropdown.classList.remove('open');
+      exportProject(pid, pname);
+    });
+  });
+
+  button.disabled = false;
+}
+
 // Export all filtered conversations
 async function exportAllFiltered() {
   const format = document.getElementById('exportFormat').value;
@@ -1292,4 +1611,22 @@ function setupEventListeners() {
 
   // Export all button
   document.getElementById('exportAllBtn').addEventListener('click', exportAllFiltered);
+
+  // Export Project dropdown toggle
+  const exportProjectBtn = document.getElementById('exportProjectBtn');
+  const projectDropdown = document.getElementById('projectDropdown');
+  if (exportProjectBtn && projectDropdown) {
+    exportProjectBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (exportProjectBtn.disabled) return;
+      // Refresh dropdown content each time it's opened (counts may have changed)
+      populateProjectDropdown();
+      projectDropdown.classList.toggle('open');
+    });
+    document.addEventListener('click', () => projectDropdown.classList.remove('open'));
+    projectDropdown.addEventListener('click', (e) => e.stopPropagation());
+  }
+
+  // Enable the Export Project button once projects are available
+  populateProjectDropdown();
 }

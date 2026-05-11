@@ -118,6 +118,14 @@
   - Click the org ID row in the browse settings dropdown to copy it
   - Toast confirms "Org ID copied to clipboard"
 
+- **Export Project — Claude Code-ready workspace** (v1.10.0)
+  - New "Export Project ▾" button on browse page lists user's projects
+  - Bundles into `{ProjectName}/CLAUDE.md + context/{chats,artifacts,knowledge}/`
+  - CLAUDE.md inlines the project's custom instructions, lists knowledge/artifacts via `@`-refs, points at chats folder
+  - Knowledge docs saved as parsed text; binary uploads summarized in `_files_manifest.md`
+  - Per-chat `.md` files with thinking + metadata; artifacts split into `context/artifacts/` with chat-name prefix
+  - Reuses existing progress modal and cancel flow
+
 ## Pending 🔄
 
 ### Critical Priority 🔴

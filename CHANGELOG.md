@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.10.0]
+
+- **Export Project** — new button on the browse page bundles a Claude.ai project as a Claude Code-ready workspace
+  - Layout: `{ProjectName}/CLAUDE.md` + `context/{chats,artifacts,knowledge}/`
+  - `CLAUDE.md` includes the project's custom instructions inline, plus `@`-references to every knowledge file and artifact, and a folder ref to chats
+  - Knowledge docs from the project (parsed text) saved under `context/knowledge/`
+  - Binary file uploads listed in `_files_manifest.md` (content not exposed by Claude API)
+  - All conversations in the project exported as individual `.md` files
+  - Artifacts extracted to `context/artifacts/`, prefixed with conversation name to avoid collisions
+  - Reuses the existing progress modal with cancel support
+
 ## [1.9.1]
 
 - Fixed Model column header alignment with badge text on browse page
