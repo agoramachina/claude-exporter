@@ -276,6 +276,33 @@ function extractArtifactsFromMessage(message) {
         }
       }
 
+      // NEW FORMAT: Analysis Tool / Computer Use create_file
+      // Tool produces a file via { path, file_text } input — not via display_content
+      if (content.type === 'tool_use' && content.name === 'create_file' && content.input) {
+        const path = content.input.path || '';
+        const fileText = content.input.file_text || '';
+        if (path && fileText) {
+          const filename = path.split('/').pop() || 'artifact';
+          const extMatch = filename.match(/\.([^.]+)$/);
+          const ext = extMatch ? extMatch[1].toLowerCase() : 'txt';
+          const title = filename.replace(/\.[^.]+$/, '') || 'artifact';
+          // Map common extensions to language keys that getFileExtension/isProgrammingLanguage recognize
+          const extToLang = {
+            md: 'markdown', txt: 'text', js: 'javascript', ts: 'typescript',
+            py: 'python', rb: 'ruby', sh: 'bash', kt: 'kotlin',
+            cs: 'csharp', rs: 'rust', tex: 'latex', mmd: 'mermaid',
+          };
+          const language = extToLang[ext] || ext;
+          artifacts.push({
+            title: title,
+            language: language,
+            type: isProgrammingLanguage(language) ? 'code' : 'document',
+            identifier: null,
+            content: fileText.trim(),
+          });
+        }
+      }
+
       // OLD FORMAT: Check text content for <antArtifact> tags
       if (content.text) {
         const textArtifacts = extractArtifactsFromText(content.text);

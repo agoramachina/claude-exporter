@@ -2,6 +2,9 @@
 
 ## [1.10.0]
 
+- **Artifact extraction now recognizes the `create_file` tool** (Analysis Tool / Computer Use file output)
+  - Previously only the legacy `artifacts` tool was extracted; chats that produced files via `create_file` lost their artifacts on export
+  - Affects popup export, browse export, and the new project export
 - **Export Project** — new button on the browse page bundles a Claude.ai project as a Claude Code-ready workspace
   - Layout: `{ProjectName}/CLAUDE.md` + `context/{chats,artifacts,knowledge}/`
   - `CLAUDE.md` includes the project's custom instructions inline, plus `@`-references to every knowledge file and artifact, and a folder ref to chats
