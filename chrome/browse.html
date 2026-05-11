@@ -309,7 +309,81 @@
       color: var(--disabled-text);
       cursor: not-allowed;
     }
-    
+
+    .export-project-wrapper {
+      position: relative;
+    }
+    .export-project-btn {
+      padding: 10px 14px;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .export-project-btn:hover:not(:disabled) {
+      color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+    .export-project-btn:disabled {
+      background: var(--disabled-bg);
+      color: var(--disabled-text);
+      cursor: not-allowed;
+    }
+    .export-project-btn .caret {
+      font-size: 10px;
+      opacity: 0.7;
+    }
+    .project-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 4px);
+      right: 0;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: 0 4px 16px var(--shadow-md);
+      min-width: 260px;
+      max-width: 360px;
+      max-height: 400px;
+      overflow-y: auto;
+      z-index: 1000;
+      padding: 4px 0;
+    }
+    .project-dropdown.open {
+      display: block;
+    }
+    .project-option {
+      padding: 10px 16px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text-primary);
+      transition: background 0.15s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .project-option:hover {
+      background: var(--secondary-bg);
+    }
+    .project-option .project-meta {
+      display: block;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .project-dropdown-empty {
+      padding: 12px 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
     .container {
       max-width: 1600px;
       margin: 20px auto;
@@ -829,6 +903,14 @@
               </label>
             </div>
           </div>
+        </div>
+
+        <div class="export-project-wrapper">
+          <button class="export-project-btn" id="exportProjectBtn" disabled title="Export a project as a Claude Code-ready workspace">
+            Export Project
+            <span class="caret">▾</span>
+          </button>
+          <div class="project-dropdown" id="projectDropdown"></div>
         </div>
 
         <button class="export-all-btn" id="exportAllBtn" disabled>
