@@ -1,5 +1,0 @@
-node_modules/
-tests/package-lock.json
-.claude/
-.vscode/
-.markdownlint.json
