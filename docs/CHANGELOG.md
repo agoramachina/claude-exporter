@@ -5,6 +5,8 @@
 - Import Backup now asks merge-vs-replace **before** opening the file picker (was after). Click Import Backup → modal asks "Merge with current data" or "Replace all current data" + "Choose File…" → file picker opens → import runs with the chosen mode. Lets you back out before navigating filesystem, and removes the awkward two-step confirmation. The modal no longer shows file contents (snapshot/export counts, creation date), since the file isn't selected yet — file validation still happens after selection.
 - `importBackup(file, onComplete)` → `importBackup(file, mode, onComplete)`; the modal helper is now `showImportModeModal(onConfirm)` and lives at the caller layer (options.js / browse.js) rather than inside `importBackup`.
 
+_Published_
+
 ## [1.10.16]
 
 - "Export Selected" now exports every checked conversation, including ones currently hidden by the funnel filter or search. Before, the export was intersected with `filteredConversations`, silently dropping checked-but-not-visible chats. The header checkbox still operates only on visible rows (unchanged).
