@@ -109,9 +109,11 @@
       line-height: 1.6;
       /* Keep the table fully visible at all times. When the viewport is
          narrower than this, the PAGE scrolls horizontally instead of the
-         table shrinking or being clipped. 1140 = 1100 (table min-width)
-         + 2 * 20px (.container horizontal padding). */
-      min-width: 1140px;
+         table shrinking or being clipped. 1200 matches .container's
+         min-width so the table's rightmost columns (Actions + Checkbox)
+         never get clipped by the container's padding eating into the
+         available space. */
+      min-width: 1200px;
     }
     
     .header {
@@ -340,6 +342,7 @@
     
     .container {
       max-width: 1600px;
+      min-width: 1200px;
       margin: 20px auto;
       padding: 0 20px;
     }

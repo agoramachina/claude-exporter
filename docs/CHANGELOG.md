@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.10.18]
+
+- Browse table: bumped `body { min-width }` from 1140px to 1200px and added matching `min-width: 1200px` to `.container`. Without the container min-width, its `20px` horizontal padding was eating into the body's floor and clipping the table's rightmost columns (Actions + Checkbox) at narrow viewports. With both at 1200px there's 1160px of usable content area inside the container — enough for the full table. The page scrolls horizontally below 1200px; the table never shrinks or clips.
+
 ## [1.10.17]
 
 - Import Backup now asks merge-vs-replace **before** opening the file picker (was after). Click Import Backup → modal asks "Merge with current data" or "Replace all current data" + "Choose File…" → file picker opens → import runs with the chosen mode. Lets you back out before navigating filesystem, and removes the awkward two-step confirmation. The modal no longer shows file contents (snapshot/export counts, creation date), since the file isn't selected yet — file validation still happens after selection.
