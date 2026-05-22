@@ -151,6 +151,9 @@
 
 ## Completed ✅
 
+- **Donate links in Options** (v1.10.20)
+  - Added "Buy me a coffee" → [buymeacoffee.com/agoramachina](https://buymeacoffee.com/agoramachina) and "Patreon" → [patreon.com/c/agoramachina](https://www.patreon.com/c/agoramachina) to the Contact & Diagnostics section. Both open in a new tab with `rel="noopener noreferrer"`.
+
 - **Org ID display shows `[Auto]` when not manually set** (v1.10.19)
   - Browse settings dropdown's org ID field used to show `"Not set"` when no manual org ID was stored, which falsely suggested the user needed to set one. Now reads `[Auto]` and a tooltip clarifies that auto-detection runs on each export. HTML default also updated.
 
