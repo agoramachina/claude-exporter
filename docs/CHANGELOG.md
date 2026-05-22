@@ -2,7 +2,7 @@
 
 ## [1.10.20]
 
-- Options page: wired up the donate links in the Contact & Diagnostics section — "Buy me a coffee" → https://buymeacoffee.com/agoramachina, "Patreon" → https://www.patreon.com/c/agoramachina. Both open in a new tab with `rel="noopener noreferrer"`.
+- Options page: wired up the donate links in the Contact & Diagnostics section — "Buy me a coffee" → [buymeacoffee.com/agoramachina](https://buymeacoffee.com/agoramachina), "Patreon" → [patreon.com/c/agoramachina](https://www.patreon.com/c/agoramachina). Both open in a new tab with `rel="noopener noreferrer"`.
 
 ## [1.10.19]
 
