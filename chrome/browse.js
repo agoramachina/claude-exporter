@@ -1126,7 +1126,9 @@ function setupEventListeners() {
         orgDisplay.textContent = orgId.substring(0, 8) + '...';
         orgDisplay.title = orgId;
       } else {
-        orgDisplay.textContent = 'Not set';
+        // No stored org ID — auto-detect will run on the next export action.
+        orgDisplay.textContent = '[Auto]';
+        orgDisplay.title = 'No manual org ID set; auto-detection runs on each export.';
       }
       // Update theme label
       const theme = document.documentElement.getAttribute('data-theme') || 'dark';

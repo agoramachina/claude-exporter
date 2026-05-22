@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.10.19]
+
+- Browse settings dropdown: org ID display now reads `[Auto]` when no manual org ID is stored (was the misleading `"Not set"`, which suggested action was required). Tooltip on hover explains: "No manual org ID set; auto-detection runs on each export." HTML default updated to match.
+
 ## [1.10.18]
 
 - Browse table: bumped `body { min-width }` from 1140px to 1200px and added matching `min-width: 1200px` to `.container`. Without the container min-width, its `20px` horizontal padding was eating into the body's floor and clipping the table's rightmost columns (Actions + Checkbox) at narrow viewports. With both at 1200px there's 1160px of usable content area inside the container — enough for the full table. The page scrolls horizontally below 1200px; the table never shrinks or clips.

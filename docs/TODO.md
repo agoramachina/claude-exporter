@@ -61,10 +61,6 @@
   - Filter by artifact filename, type, or whether artifacts exist
   - Helps find specific artifacts across all conversations
 
-- **Contact dev / feedback link**
-  - Add to settings dropdown on browse page
-  - Way for users to reach out (feedback, bug reports)
-  
 - **PDF export for artifacts**
   - Generate PDF versions of artifacts
   - Useful for documentation and sharing
@@ -98,6 +94,7 @@
 
 - **Robust filter**
   - Filter by project, model, artifact
+  - Project search SHIPPED (v1.10.1) — "Search projects" option in the funnel dropdown scopes the search bar to project names. Model + artifact filtering still pending.
 
 - **Advanced settings menu**
   - Verbosity toggle & Debug log
@@ -107,9 +104,6 @@
   - Custom date/time format
     - Custom format string (e.g. `%d/%m/%Y %H:%M`)
     - Toggle time display on/off
-
-- **Don't ask for Organization ID if it's empty**
-  - If the user hasn't set this, display "[Auto]" in the id field of the browse settings popup window
 
 ### Low Priority 🟢
 
@@ -156,6 +150,15 @@
 (none currently open)
 
 ## Completed ✅
+
+- **Org ID display shows `[Auto]` when not manually set** (v1.10.19)
+  - Browse settings dropdown's org ID field used to show `"Not set"` when no manual org ID was stored, which falsely suggested the user needed to set one. Now reads `[Auto]` and a tooltip clarifies that auto-detection runs on each export. HTML default also updated.
+
+- **Contact & Diagnostics section in Options** (v1.10.3, slimmed v1.10.5)
+  - "Email developer" — mailto with pre-filled subject (`Claude Exporter Bug Report — vX.Y.Z`) and a short body template
+  - "Generate diagnostics" — downloads a sanitized JSON bundle (extension/browser version, counts of stored records, current preferences, `orgIdConfigured` boolean, last 50 captured errors). All UUIDs redacted at capture time. No conversation content.
+  - Each context (popup / browse / content / options) registers `error` + `unhandledrejection` listeners that push to a 50-entry FIFO ring buffer in `chrome.storage.local`
+  - v1.10.5 collapsed the original three buttons into two inline links inside a single sentence (less cluttered, same behavior)
 
 - **Removed redundant "View" button from browse table** (v1.10.9)
   - Chat name in the Name column is already a clickable link to the conversation; the "View" button duplicated that. Removed the button, handler, and `.btn-view` CSS. Narrower Actions column lets table `min-width` drop from 1200px to 1100px.
