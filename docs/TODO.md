@@ -52,6 +52,15 @@
 
 ### Medium Priority 🟡
 
+- **Automate Firefox signing in the release workflow**
+  - Add a `web-ext sign` step to `.github/workflows/release.yml` to sign the .xpi and submit to AMO on tag push
+  - Needs AMO API credentials (`WEB_EXT_API_KEY` / `WEB_EXT_API_SECRET`) stored as GitHub repo secrets
+  - Attach the signed .xpi to the GitHub release alongside the zips
+
+- **Automate Chrome Web Store upload in the release workflow**
+  - Use the Chrome Web Store API (e.g. `chrome-webstore-upload-cli`) to upload + publish the chrome zip on tag push
+  - Needs a Google Cloud OAuth client (client ID, secret, refresh token) and the extension ID, stored as GitHub repo secrets
+
 - **Artifact indicators in browse table**
   - Show icon next to conversation name if it contains artifacts
   - Add filter options in funnel dropdown: with artifacts / without artifacts
@@ -150,6 +159,10 @@
 (none currently open)
 
 ## Completed ✅
+
+- **GitHub Actions release + checks workflows** (v1.10.21)
+  - Tag push (`vX.Y.Z`) builds both zips and creates the GitHub release with CHANGELOG notes; manual run = dry-run artifact
+  - Every push to `testing`: version/parity/syntax checks, vitest, `web-ext lint`, test build
 
 - **Duplicate-title ZIP overwrites + filename sanitizing** (v1.10.21)
   - Bulk exports no longer drop same-titled conversations (`uniqueFilename()` suffixes `(2)`, `(3)`, …); untitled chats no longer crash browse export; titles sanitized for control chars, trailing dots, length; blob URLs revoked after a delay (Firefox download reliability).

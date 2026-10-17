@@ -1,0 +1,32 @@
+name: Checks
+
+on:
+  push:
+    branches: [testing]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Version, parity, and syntax checks
+        run: .github/scripts/check.sh
+
+      - name: Unit tests
+        working-directory: tests
+        run: |
+          npm install --no-audit --no-fund
+          npm test
+
+      - name: Lint Firefox build
+        run: npx --yes web-ext lint --source-dir firefox
+
+      - name: Test release build
+        run: .github/scripts/build.sh

@@ -1,0 +1,51 @@
+name: Release
+
+# Push a tag to release:   git tag v1.2.3 && git push origin v1.2.3
+# Or run manually from the Actions tab for a dry run: builds the zips and
+# uploads them as a downloadable artifact without creating a release.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Version, parity, and syntax checks
+        run: .github/scripts/check.sh
+
+      - name: Unit tests
+        working-directory: tests
+        run: |
+          npm install --no-audit --no-fund
+          npm test
+
+      - name: Build zips and release notes
+        run: .github/scripts/build.sh ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
+
+      - name: Upload dry-run artifact
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-preview
+          path: dist/
+
+      - name: Create GitHub release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/*.zip \
+            --title "$GITHUB_REF_NAME" \
+            --notes-file dist/release-notes.md \
+            --verify-tag

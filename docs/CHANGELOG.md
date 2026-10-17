@@ -8,6 +8,7 @@
 - Blob download URLs are now revoked after a delay instead of synchronously after `a.click()`, which can cancel the download in Firefox.
 - Added `sanitizeFilename` / `uniqueFilename` unit tests.
 - Same fixes shipped in DeepSeek Exporter v1.4.2 (shared bugs from the port).
+- Releases are now built by GitHub Actions: pushing a `vX.Y.Z` tag runs checks + tests, builds both zips (" Beta" stripped), and creates the GitHub release with notes from this CHANGELOG. A checks workflow runs on every push to `testing` (manifest versions, Chrome/Firefox parity, JS syntax, vitest, `web-ext lint`, test build). Dev tooling only; no extension code changed.
 
 ## [1.10.20]
 

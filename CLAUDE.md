@@ -23,7 +23,7 @@ Keep it concise. Don't duplicate what's already here — update existing section
 - Extension source and git repo lives in `src/`
 - Parallel Chrome (`src/chrome/`) and Firefox (`src/firefox/`) versions — nearly identical copies
 - Chrome uses Manifest V3, Firefox uses Manifest V2
-- Releases go in `releases/vX.Y.Z/`
+- Releases are built by GitHub Actions (see Release Process); build scripts live in `.github/scripts/`
 
 ## Key Files (under `src/chrome/` and `src/firefox/`)
 - `content.js` — Content script injected on claude.ai pages (handles API calls, popup export actions)
@@ -57,16 +57,18 @@ Keep it concise. Don't duplicate what's already here — update existing section
 
 **Only create releases when explicitly asked.** Never auto-release.
 
-When the user asks to create a release for version X.Y.Z:
+Releases are built by GitHub Actions (`.github/workflows/release.yml`), triggered by pushing a version tag. When the user asks to release version X.Y.Z:
 
-1. **Verify version** — Confirm both `chrome/manifest.json` and `firefox/manifest.json` show the correct version
-2. **Create release directory** — `mkdir -p releases/vX.Y.Z`
-3. **ZIP Chrome extension** — `cd src/chrome && zip -r ../../releases/vX.Y.Z/claude-exporter-chrome.zip ./*`
-4. **ZIP Firefox extension** — `cd src/firefox && zip -r ../../releases/vX.Y.Z/claude-exporter-firefox.zip ./*` (unsigned; user handles .xpi signing via AMO)
-5. **Git tag** — `cd src && git tag vX.Y.Z -m "Release vX.Y.Z"`
-6. **Push tag** — `git push origin vX.Y.Z`
-7. **Create GitHub release** — `gh release create vX.Y.Z ../releases/vX.Y.Z/* --title "vX.Y.Z" --notes "$(changelog excerpt from docs/CHANGELOG.md)"` — use all changes since last `_Published_` marker as the notes
-8. **Mark as published** — Add `_Published_` line after the released version's entries in docs/CHANGELOG.md, commit
+1. **Verify** — both manifests show `X.Y.Z` and `docs/CHANGELOG.md` has `## [X.Y.Z]` as its top entry (the workflow fails otherwise)
+2. **Merge** — merge `testing` → `main` (flip manifest names to drop "Beta", see below)
+3. **Tag and push** — `git tag vX.Y.Z -m "Release vX.Y.Z" && git push origin main vX.Y.Z`
+4. **Workflow does the rest** — runs checks + tests, builds `claude-exporter-chrome.zip` / `claude-exporter-firefox.zip` (" Beta" stripped from the shipped manifests), and creates the GitHub release with notes = all CHANGELOG entries newer than the last `_Published_` marker
+5. **Store uploads stay manual** — upload the zips to the Chrome Web Store and AMO (user handles .xpi signing)
+6. **Mark as published** — once live in the stores, add a `_Published_` line after the released version's entries in docs/CHANGELOG.md, commit
+
+**Dry run:** Actions tab → Release → "Run workflow" builds the zips and uploads them as a downloadable `release-preview` artifact without creating a release. Locally: `DIST=/tmp/out .github/scripts/build.sh vX.Y.Z`.
+
+**Checks** (`.github/workflows/checks.yml`) run on every push to `testing` and on PRs to `main`: manifest versions match, chrome/firefox parity (via `.github/scripts/check.sh`, files allowed to differ are listed in `ALLOWED_DIFFS`), JS syntax, vitest, `web-ext lint`, and a test release build. If you intentionally make a file differ between browsers, add it to `ALLOWED_DIFFS`.
 
 ## Critical Rules
 
@@ -91,7 +93,7 @@ Any export producing more than one file should always create a ZIP — never tri
 
 The popup header title is populated from `manifest.name` in `popup.js` (`#header-title`), so the popup automatically reads "Claude Exporter Beta" on the testing branch — no separate HTML edit needed.
 
-When merging `testing` → `main` for a release, flip both manifest names to drop "Beta" as part of the merge.
+When merging `testing` → `main` for a release, flip both manifest names to drop "Beta" as part of the merge. (The release build also strips " Beta" from the shipped manifests as a safety net, so a missed flip can't leak into a release.)
 
 ## Testing
 
