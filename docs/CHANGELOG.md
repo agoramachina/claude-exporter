@@ -7,6 +7,7 @@
 - Single-conversation ZIPs (artifact extraction) now sanitize the title too — a chat named `A/B testing` used to put its file in an `A/` subfolder inside the ZIP.
 - Blob download URLs are now revoked after a delay instead of synchronously after `a.click()`, which can cancel the download in Firefox.
 - Added `sanitizeFilename` / `uniqueFilename` unit tests.
+- Same fixes shipped in DeepSeek Exporter v1.4.2 (shared bugs from the port).
 
 ## [1.10.20]
 
