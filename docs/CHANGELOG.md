@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.10.21]
+
+- Fixed bulk ZIP exports silently dropping conversations that share a title (e.g. several "New chat"s). `zip.file()` replaces same-named entries, so only the last one survived; in nested-artifact mode, same-titled conversations were merged into one folder and their artifacts could overwrite each other. Duplicates are now suffixed `" (2)"`, `" (3)"`, … via new `uniqueFilename()` (case-insensitive, since Windows/macOS filesystems are). Applies to popup Export All and browse-page Export Selected/All.
+- Fixed browse-page bulk export failing on untitled conversations (`conv.name.replace` threw on a null name; empty names produced a bare `.md`). New `sanitizeFilename()` also strips control characters/newlines, trailing dots/spaces, and caps length at 150; falls back to `"Untitled"`.
+- Single-conversation ZIPs (artifact extraction) now sanitize the title too — a chat named `A/B testing` used to put its file in an `A/` subfolder inside the ZIP.
+- Blob download URLs are now revoked after a delay instead of synchronously after `a.click()`, which can cancel the download in Firefox.
+- Added `sanitizeFilename` / `uniqueFilename` unit tests.
+
 ## [1.10.20]
 
 - Options page: wired up the donate links in the Contact & Diagnostics section — "Buy me a coffee" → [buymeacoffee.com/agoramachina](https://buymeacoffee.com/agoramachina), "Patreon" → [patreon.com/c/agoramachina](https://www.patreon.com/c/agoramachina). Both open in a new tab with `rel="noopener noreferrer"`.

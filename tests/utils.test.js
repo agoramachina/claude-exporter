@@ -12,6 +12,8 @@ const {
   formatModelName,
   getModelBadgeClass,
   DEFAULT_MODEL_TIMELINE,
+  sanitizeFilename,
+  uniqueFilename,
 } = utils;
 
 // Regression coverage for the bug fixed in v1.9.1: bash/web_search/repl
@@ -552,5 +554,61 @@ describe('convertToMarkdown — smoke test', () => {
     };
     const md = convertToMarkdown(data, true);
     expect(md).toContain('My Chat');
+  });
+});
+
+// Regression coverage for v1.10.21: bulk ZIP exports silently overwrote
+// conversations that shared a title (zip.file() replaces same-named entries),
+// and null/empty titles produced crashes or bare ".md" files.
+describe('sanitizeFilename', () => {
+  it('replaces filesystem-reserved characters', () => {
+    expect(sanitizeFilename('A/B: testing?')).toBe('A_B_ testing_');
+  });
+
+  it('replaces control characters and collapses whitespace', () => {
+    expect(sanitizeFilename('line\nbreak\ttab')).toBe('line_break_tab');
+    expect(sanitizeFilename('  lots   of   space  ')).toBe('lots of space');
+  });
+
+  it('strips trailing dots and spaces (invalid on Windows)', () => {
+    expect(sanitizeFilename('trailing...  ')).toBe('trailing');
+  });
+
+  it('falls back to "Untitled" for null, empty, or whitespace-only names', () => {
+    expect(sanitizeFilename(null)).toBe('Untitled');
+    expect(sanitizeFilename('')).toBe('Untitled');
+    expect(sanitizeFilename('   ')).toBe('Untitled');
+  });
+
+  it('caps length at 150 characters', () => {
+    expect(sanitizeFilename('x'.repeat(300))).toHaveLength(150);
+  });
+});
+
+describe('uniqueFilename', () => {
+  it('suffixes duplicates with (2), (3), ...', () => {
+    const used = new Set();
+    expect(uniqueFilename('New chat', 'md', used)).toBe('New chat.md');
+    expect(uniqueFilename('New chat', 'md', used)).toBe('New chat (2).md');
+    expect(uniqueFilename('New chat', 'md', used)).toBe('New chat (3).md');
+  });
+
+  it('treats names case-insensitively', () => {
+    const used = new Set();
+    uniqueFilename('Notes', 'md', used);
+    expect(uniqueFilename('notes', 'md', used)).toBe('notes (2).md');
+  });
+
+  it('supports extensionless folder names', () => {
+    const used = new Set();
+    expect(uniqueFilename('Project', '', used)).toBe('Project');
+    expect(uniqueFilename('Project', '', used)).toBe('Project (2)');
+  });
+
+  it('does not collide with a real title that looks like a suffix', () => {
+    const used = new Set();
+    uniqueFilename('Chat', '', used);
+    uniqueFilename('Chat', '', used); // -> "Chat (2)"
+    expect(uniqueFilename('Chat (2)', '', used)).toBe('Chat (2) (2)');
   });
 });

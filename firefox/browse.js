@@ -676,6 +676,7 @@ async function exportConversation(conversationId, conversationName) {
 
     // Infer model if null
     data.model = inferModel(data);
+    const safeName = sanitizeFilename(conversationName || conversationId);
 
     // Check if we need to extract artifacts to separate files
     if (extractArtifacts || flattenArtifacts) {
@@ -692,15 +693,15 @@ async function exportConversation(conversationId, conversationName) {
           switch (format) {
             case 'markdown':
               conversationContent = convertToMarkdown(data, includeMetadata, conversationId, includeArtifacts, includeThinking);
-              conversationFilename = `${conversationName || conversationId}.md`;
+              conversationFilename = `${safeName}.md`;
               break;
             case 'text':
               conversationContent = convertToText(data, includeMetadata, includeArtifacts, includeThinking);
-              conversationFilename = `${conversationName || conversationId}.txt`;
+              conversationFilename = `${safeName}.txt`;
               break;
             default:
               conversationContent = JSON.stringify(data, null, 2);
-              conversationFilename = `${conversationName || conversationId}.json`;
+              conversationFilename = `${safeName}.json`;
           }
 
           // Flat export: add to Chats folder
@@ -726,7 +727,7 @@ async function exportConversation(conversationId, conversationName) {
         if (flattenArtifacts && !extractArtifacts) {
           const artifactsFolder = zip.folder('Artifacts');
           for (const artifact of artifactFiles) {
-            const filename = `${conversationName}_${artifact.filename}`;
+            const filename = `${safeName}_${artifact.filename}`;
             artifactsFolder.file(filename, artifact.content);
           }
         }
@@ -736,11 +737,11 @@ async function exportConversation(conversationId, conversationName) {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${conversationName || conversationId}.zip`;
+        a.download = `${safeName}.zip`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
 
         // Toast handled below after timestamp save
       } else {
@@ -749,17 +750,17 @@ async function exportConversation(conversationId, conversationName) {
         switch (format) {
           case 'markdown':
             content = convertToMarkdown(data, includeMetadata, conversationId, includeArtifacts, includeThinking);
-            filename = `${conversationName || conversationId}.md`;
+            filename = `${safeName}.md`;
             type = 'text/markdown';
             break;
           case 'text':
             content = convertToText(data, includeMetadata, includeArtifacts, includeThinking);
-            filename = `${conversationName || conversationId}.txt`;
+            filename = `${safeName}.txt`;
             type = 'text/plain';
             break;
           default:
             content = JSON.stringify(data, null, 2);
-            filename = `${conversationName || conversationId}.json`;
+            filename = `${safeName}.json`;
             type = 'application/json';
         }
         downloadFile(content, filename, type);
@@ -775,17 +776,17 @@ async function exportConversation(conversationId, conversationName) {
         switch (format) {
           case 'markdown':
             content = convertToMarkdown(data, includeMetadata, conversationId, includeArtifacts, includeThinking);
-            filename = `${conversationName || conversationId}.md`;
+            filename = `${safeName}.md`;
             type = 'text/markdown';
             break;
           case 'text':
             content = convertToText(data, includeMetadata, includeArtifacts, includeThinking);
-            filename = `${conversationName || conversationId}.txt`;
+            filename = `${safeName}.txt`;
             type = 'text/plain';
             break;
           default:
             content = JSON.stringify(data, null, 2);
-            filename = `${conversationName || conversationId}.json`;
+            filename = `${safeName}.json`;
             type = 'application/json';
         }
         downloadFile(content, filename, type);
@@ -879,6 +880,7 @@ async function exportAllFiltered() {
   try {
     // Create a new ZIP file
     const zip = new JSZip();
+    const usedNames = new Set();
     const total = conversationsToExport.length;
     let completed = 0;
     let failed = 0;
@@ -925,7 +927,7 @@ async function exportAllFiltered() {
 
           // Generate filename and content based on format
           let content, filename;
-          const safeName = conv.name.replace(/[<>:"/\\|?*]/g, '_'); // Remove invalid filename characters
+          const safeName = uniqueFilename(sanitizeFilename(conv.name || conv.uuid), '', usedNames);
 
           switch (format) {
             case 'markdown':
@@ -1032,7 +1034,7 @@ async function exportAllFiltered() {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
     
     progressModal.style.display = 'none';
 

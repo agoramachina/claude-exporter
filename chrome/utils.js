@@ -233,7 +233,31 @@ function downloadFile(content, filename, type = 'application/json') {
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  // Revoking synchronously can cancel the download in Firefox
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+
+// Make a conversation title safe to use as a file or folder name
+function sanitizeFilename(name) {
+  const safe = String(name || '')
+    .replace(/[<>:"/\\|?*\x00-\x1f]/g, '_')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/[. ]+$/, '')
+    .slice(0, 150);
+  return safe || 'Untitled';
+}
+
+// Return a name not already in `used` (and add it), suffixing " (2)", " (3)", ... on collision.
+// `ext` may be empty for folder names. Comparison is case-insensitive (Windows/macOS filesystems).
+function uniqueFilename(base, ext, used) {
+  const suffix = ext ? `.${ext}` : '';
+  let name = `${base}${suffix}`;
+  for (let n = 2; used.has(name.toLowerCase()); n++) {
+    name = `${base} (${n})${suffix}`;
+  }
+  used.add(name.toLowerCase());
+  return name;
 }
 
 // ============================================================================
@@ -709,7 +733,7 @@ function backupExtensionData(onComplete) {
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
       const snapCount = Object.keys(backup.local.modelSnapshots || {}).length;
       const exportCount = Object.keys(backup.local.exportTimestamps || {}).length;
       if (onComplete) onComplete(true, `Backup exported — ${snapCount} model snapshot(s), ${exportCount} export record(s).`);
@@ -1028,7 +1052,7 @@ function generateDiagnostics(onComplete) {
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
 
         if (onComplete) {
           onComplete(true, `Diagnostics downloaded — ${errorLog.length} error(s) captured, all IDs redacted.`);
@@ -1046,6 +1070,8 @@ if (typeof module !== 'undefined' && module.exports) {
     convertToMarkdown,
     convertToText,
     downloadFile,
+    sanitizeFilename,
+    uniqueFilename,
     extractArtifactsFromMessage,
     extractArtifactsFromText,
     extractArtifacts,

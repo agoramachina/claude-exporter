@@ -151,6 +151,9 @@
 
 ## Completed ✅
 
+- **Duplicate-title ZIP overwrites + filename sanitizing** (v1.10.21)
+  - Bulk exports no longer drop same-titled conversations (`uniqueFilename()` suffixes `(2)`, `(3)`, …); untitled chats no longer crash browse export; titles sanitized for control chars, trailing dots, length; blob URLs revoked after a delay (Firefox download reliability).
+
 - **Donate links in Options** (v1.10.20)
   - Added "Buy me a coffee" → [buymeacoffee.com/agoramachina](https://buymeacoffee.com/agoramachina) and "Patreon" → [patreon.com/c/agoramachina](https://www.patreon.com/c/agoramachina) to the Contact & Diagnostics section. Both open in a new tab with `rel="noopener noreferrer"`.
 
