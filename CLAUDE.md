@@ -62,7 +62,7 @@ Releases are built by GitHub Actions (`.github/workflows/release.yml`), triggere
 1. **Verify** — both manifests show `X.Y.Z` and `docs/CHANGELOG.md` has `## [X.Y.Z]` as its top entry (the workflow fails otherwise)
 2. **Merge** — merge `testing` → `main` (flip manifest names to drop "Beta", see below)
 3. **Tag and push** — `git tag vX.Y.Z -m "Release vX.Y.Z" && git push origin main vX.Y.Z`
-4. **Workflow does the rest** — runs checks + tests, builds `claude-exporter-chrome.zip` / `claude-exporter-firefox.zip` (" Beta" stripped from the shipped manifests), and creates the GitHub release with notes = all CHANGELOG entries newer than the last `_Published_` marker
+4. **Workflow does the rest** — runs checks + tests, builds `claude-exporter-chrome_vX.Y.Z.zip` / `claude-exporter-firefox_vX.Y.Z.zip` (" Beta" stripped from the shipped manifests), and creates the GitHub release with notes = all CHANGELOG entries newer than the last `_Published_` marker
 5. **Store uploads stay manual** — upload the zips to the Chrome Web Store and AMO (user handles .xpi signing)
 6. **Mark as published** — once live in the stores, add a `_Published_` line after the released version's entries in docs/CHANGELOG.md, commit
 

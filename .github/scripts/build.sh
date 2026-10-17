@@ -3,7 +3,7 @@
 #   Usage: build.sh [vX.Y.Z]
 # With a tag argument, fails unless it matches both manifest versions.
 # Outputs:
-#   $DIST/<project>-chrome.zip, $DIST/<project>-firefox.zip   (" Beta" stripped from manifest name)
+#   $DIST/<project>-chrome_vX.Y.Z.zip, $DIST/<project>-firefox_vX.Y.Z.zip   (" Beta" stripped from manifest name)
 #   $DIST/release-notes.md   (CHANGELOG entries newer than the last published version)
 set -euo pipefail
 
@@ -50,7 +50,7 @@ for browser in chrome firefox; do
     fs.writeFileSync(p, JSON.stringify(m, null, 2) + "\n");
     console.log(`  ${p}: name="${m.name}" version=${m.version}`);
   ' "$staging/manifest.json"
-  (cd "$staging" && zip -q -r -X "../$project-$browser.zip" .)
+  (cd "$staging" && zip -q -r -X "../${project}-${browser}_v${version}.zip" .)
   rm -rf "$staging"
 done
 

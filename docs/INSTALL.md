@@ -19,11 +19,11 @@ For users who want to install manually without the browser stores.
 
 ### Chrome (and Chromium-based browsers)
 
-1. Download the `claude-exporter-chrome-vX.X.X.zip` from the [Releases page](https://github.com/agoramachina/claude-exporter/releases)
+1. Download the `claude-exporter-chrome_vX.Y.Z.zip` from the [Releases page](https://github.com/agoramachina/claude-exporter/releases)
 2. Extract the zip into a safe folder (this will be the permanent location - don't move or delete it!)
 3. Open Chrome and navigate to `chrome://extensions/`
 4. Enable **Developer mode** (toggle in top right)
-5. Click **Load unpacked** and select the extracted `claude-exporter-chrome` folder
+5. Click **Load unpacked** and select the extracted `claude-exporter-chrome_vX.Y.Z` folder
 6. Done! Proceed to [Configuration](#configuration)
 
 ### Firefox
