@@ -116,6 +116,11 @@
 
 ### Low Priority 🟢
 
+- **Consider dropping the manual "Beta" flip on release merges**
+  - `.github/scripts/build.sh` already strips " Beta" from the shipped manifests, so the release zips are correct even if `main` still says "Claude Exporter Beta"
+  - Option: keep "Beta" in source on both branches and remove the flip step from CLAUDE.md's release process (fewer merge-time edits, one less thing to forget)
+  - Keeping the manual flip for now (decided 2026-10-17)
+
 - **True cancellation of in-flight bulk export fetches**
   - Cancel button currently hides the modal immediately, but in-flight batch fetches still run in the background until they finish
   - Wire up an `AbortController` so the actual `fetch()` calls and ZIP work get aborted on cancel
