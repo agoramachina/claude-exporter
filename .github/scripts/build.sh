@@ -28,6 +28,9 @@ if [[ "$top" != "## [$version]" ]]; then
   echo "::error::docs/CHANGELOG.md top entry is '$top', expected '## [$version]'"; exit 1
 fi
 
+# GitHub runner images aren't guaranteed to ship zip (e.g. the Ubuntu 26 migration)
+command -v zip >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq zip; }
+
 rm -rf "$DIST"
 mkdir -p "$DIST"
 
