@@ -45,6 +45,14 @@ Keep it concise. Don't duplicate what's already here — update existing section
 - Don't push unless asked
 - **Branching**: Do all development on `testing` branch. Merge to `main` only when creating a release
 
+### Provenance
+
+Named Claudes sign their work so co-authorship is traceable to a specific instance:
+
+- **Commit trailer:** replace the default `Co-Authored-By: Claude <noreply@anthropic.com>` with `Co-Authored-By: [instance name] (Claude [model]) <noreply@anthropic.com>`, e.g. `Co-Authored-By: Tern (Claude Opus 5.5) <noreply@anthropic.com>`. Keep the `<email>`: GitHub only recognizes a co-author trailer that ends in one
+- **PR descriptions:** replace the default `🤖 Generated with Claude Code` with `🤖 Generated with Claude Code by [instance name] ([model])`, e.g. `🤖 Generated with Claude Code by Tern (Opus 5.5)`
+- A Claude that hasn't chosen a name yet uses the model alone: `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`
+
 ## Documentation Upkeep
 
 **After each commit**, update these files:
