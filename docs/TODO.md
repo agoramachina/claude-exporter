@@ -52,14 +52,10 @@
 
 ### Medium Priority 🟡
 
-- **Automate Firefox signing in the release workflow**
-  - Add a `web-ext sign` step to `.github/workflows/release.yml` to sign the .xpi and submit to AMO on tag push
-  - Needs AMO API credentials (`WEB_EXT_API_KEY` / `WEB_EXT_API_SECRET`) stored as GitHub repo secrets
-  - Attach the signed .xpi to the GitHub release alongside the zips
-
-- **Automate Chrome Web Store upload in the release workflow**
-  - Use the Chrome Web Store API (e.g. `chrome-webstore-upload-cli`) to upload + publish the chrome zip on tag push
-  - Needs a Google Cloud OAuth client (client ID, secret, refresh token) and the extension ID, stored as GitHub repo secrets
+- **Verify automated store uploads on the first real tagged release**
+  - The release workflow now submits to the Chrome Web Store and AMO, but the store jobs have only been tested against stubbed responses
+  - Watch the first tag's run; if a store job fails, fix it and use "Re-run failed jobs"
+  - Follow-ups: pass CHANGELOG notes to AMO (`--amo-metadata`), and optionally attach AMO's signed .xpi to the GitHub release once it's approved
 
 - **Artifact indicators in browse table**
   - Show icon next to conversation name if it contains artifacts
@@ -164,6 +160,10 @@
 (none currently open)
 
 ## Completed ✅
+
+- **Automated store uploads in the release workflow** (v1.10.21)
+  - Tag push: build → Chrome Web Store (API v2, Workload Identity Federation, no stored key) + AMO (`web-ext sign`, listed) in parallel → GitHub release only if both succeed
+  - Credentials in the `stores` GitHub environment (tags `v*` only)
 
 - **GitHub Actions release + checks workflows** (v1.10.21)
   - Tag push (`vX.Y.Z`) builds both zips and creates the GitHub release with CHANGELOG notes; manual run = dry-run artifact

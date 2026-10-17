@@ -62,11 +62,13 @@ Releases are built by GitHub Actions (`.github/workflows/release.yml`), triggere
 1. **Verify** — both manifests show `X.Y.Z` and `docs/CHANGELOG.md` has `## [X.Y.Z]` as its top entry (the workflow fails otherwise)
 2. **Merge** — merge `testing` → `main` (flip manifest names to drop "Beta", see below)
 3. **Tag and push** — `git tag vX.Y.Z -m "Release vX.Y.Z" && git push origin main vX.Y.Z`
-4. **Workflow does the rest** — runs checks + tests, builds `claude-exporter-chrome_vX.Y.Z.zip` / `claude-exporter-firefox_vX.Y.Z.zip` (" Beta" stripped from the shipped manifests), and creates the GitHub release with notes = all CHANGELOG entries newer than the last `_Published_` marker
-5. **Store uploads stay manual** — upload the zips to the Chrome Web Store and AMO (user handles .xpi signing)
+4. **Workflow does the rest** — runs checks + tests, builds `claude-exporter-chrome_vX.Y.Z.zip` / `claude-exporter-firefox_vX.Y.Z.zip` (" Beta" stripped from the shipped manifests), then **submits to both stores in parallel**: Chrome Web Store via API v2 (`.github/scripts/chrome-publish.sh`, Google access via Workload Identity Federation, no stored key) and Firefox Add-ons via `web-ext sign --channel listed`. Only if both succeed does it create the GitHub release (notes = all CHANGELOG entries newer than the last `_Published_` marker). If one store job fails, fix it and use "Re-run failed jobs"
+5. **Store review happens on the stores' schedule** — both submissions go into review; nothing more to upload by hand
 6. **Mark as published** — once live in the stores, add a `_Published_` line after the released version's entries in docs/CHANGELOG.md, commit
 
-**Dry run:** Actions tab → Release → "Run workflow" builds the zips and uploads them as a downloadable `release-preview` artifact without creating a release. Locally: `DIST=/tmp/out .github/scripts/build.sh vX.Y.Z`.
+**Dry run:** Actions tab → Release → "Run workflow" builds the zips and uploads them as a downloadable `release-build` artifact. Store and release jobs only run for tags, so nothing is submitted.
+
+**Store credentials** live in the GitHub environment `stores` (deployment rule: tags `v*` only): secrets `AMO_JWT_ISSUER` / `AMO_JWT_SECRET`, variables `GCP_WIF_PROVIDER`, `GCP_SERVICE_ACCOUNT`, `CWS_PUBLISHER_ID`, `CWS_EXTENSION_ID`. Google side: project `am-exporter-releases`, service account `cws-publisher@…`, workload identity pool `github` / provider `exporters` (condition: owner `agoramachina` + environment `stores`). Locally: `DIST=/tmp/out .github/scripts/build.sh vX.Y.Z`.
 
 **Checks** (`.github/workflows/checks.yml`) run on every push to `testing` and on PRs to `main`: manifest versions match, chrome/firefox parity (via `.github/scripts/check.sh`, files allowed to differ are listed in `ALLOWED_DIFFS`), JS syntax, vitest, `web-ext lint`, and a test release build. If you intentionally make a file differ between browsers, add it to `ALLOWED_DIFFS`.
 

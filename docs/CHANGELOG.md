@@ -9,6 +9,7 @@
 - Added `sanitizeFilename` / `uniqueFilename` unit tests.
 - Same fixes shipped in DeepSeek Exporter v1.4.2 (shared bugs from the port).
 - Releases are now built by GitHub Actions: pushing a `vX.Y.Z` tag runs checks + tests, builds both zips as `claude-exporter-<browser>_vX.Y.Z.zip` (" Beta" stripped; earlier releases used unversioned names), and creates the GitHub release with notes from this CHANGELOG. A checks workflow runs on every push to `testing` (manifest versions, Chrome/Firefox parity, JS syntax, vitest, `web-ext lint`, test build). Dev tooling only; no extension code changed.
+- Releases now submit to the stores automatically: pushing a `vX.Y.Z` tag builds both zips, submits them to the Chrome Web Store (API v2, authenticated through Workload Identity Federation with no stored key) and Firefox Add-ons (`web-ext sign`) in parallel, and creates the GitHub release only once both submissions succeed. Store credentials live in a `stores` GitHub environment limited to version tags.
 
 ## [1.10.20]
 
