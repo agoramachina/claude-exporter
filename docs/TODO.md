@@ -161,6 +161,9 @@
 
 ## Completed ✅
 
+- **Browse page organization switcher** (v1.10.22)
+  - Header dropdown lists every chat-capable org (hidden with one org); switching reloads conversations and is remembered across visits
+
 - **Automated store uploads in the release workflow** (v1.10.21)
   - Tag push: build → Chrome Web Store (API v2, Workload Identity Federation, no stored key) + AMO (`web-ext sign`, listed) in parallel → GitHub release only if both succeed
   - Credentials in the `stores` GitHub environment (tags `v*` only)

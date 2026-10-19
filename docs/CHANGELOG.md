@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.10.22]
+
+- Browse page: added an organization switcher. Auto-detection always picked the first chat-capable org, so accounts in several orgs could never browse or export the others. `detectOrgId` now also returns all chat-capable orgs; the browse header shows a dropdown (hidden when there's only one org), switching reloads that org's projects and conversations, and the choice is remembered across visits.
+
 ## [1.10.21]
 
 - Fixed bulk ZIP exports silently dropping conversations that share a title (e.g. several "New chat"s). `zip.file()` replaces same-named entries, so only the last one survived; in nested-artifact mode, same-titled conversations were merged into one folder and their artifacts could overwrite each other. Duplicates are now suffixed `" (2)"`, `" (3)"`, … via new `uniqueFilename()` (case-insensitive, since Windows/macOS filesystems are). Applies to popup Export All and browse-page Export Selected/All.
