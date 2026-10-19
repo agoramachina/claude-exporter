@@ -165,6 +165,9 @@
 
 ## Completed ✅
 
+- **Browse page organization switcher** (v1.10.25)
+  - Header dropdown lists every chat-capable org (hidden with one org); switching reloads conversations and is remembered across visits
+
 - **conversationCreatedAt / conversationUpdatedAt in model snapshot records + backups** (v1.10.24)
 
 - **Fable badge color; crimson default badge** (v1.10.23)

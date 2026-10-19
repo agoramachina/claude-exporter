@@ -184,10 +184,16 @@ async function loadOrgId() {
   try {
     const response = await sendMessageToClaudeTab('detectOrgId', {});
     if (response && response.success && response.orgId) {
-      orgId = response.orgId;
+      const orgs = Array.isArray(response.orgs) ? response.orgs : [];
+      // Prefer the org last picked in the browse switcher if the account still has it
+      const browseOrgId = await new Promise((resolve) => {
+        chrome.storage.local.get(['browseOrgId'], (result) => resolve(result.browseOrgId));
+      });
+      orgId = orgs.some(org => org.uuid === browseOrgId) ? browseOrgId : response.orgId;
       // Save for future use / fallback
       chrome.storage.sync.set({ organizationId: orgId });
-      console.log('Auto-detected organization ID:', orgId);
+      console.log('Using organization ID:', orgId);
+      populateOrgSelect(orgs);
       return;
     }
   } catch (e) {
@@ -204,6 +210,36 @@ async function loadOrgId() {
       resolve();
     });
   });
+}
+
+// Fill the org switcher; hidden when the account has only one org
+function populateOrgSelect(orgs) {
+  const select = document.getElementById('orgSelect');
+  if (!select) return;
+  select.innerHTML = '';
+  orgs.forEach(org => {
+    const option = document.createElement('option');
+    option.value = org.uuid;
+    option.textContent = org.name;
+    option.selected = org.uuid === orgId;
+    select.appendChild(option);
+  });
+  select.style.display = orgs.length > 1 ? '' : 'none';
+}
+
+// Switch to another org and reload its conversations
+async function switchOrg(newOrgId) {
+  if (!newOrgId || newOrgId === orgId) return;
+  orgId = newOrgId;
+  chrome.storage.local.set({ browseOrgId: orgId });
+  chrome.storage.sync.set({ organizationId: orgId });
+  selectedConversations.clear();
+  allConversations = [];
+  allProjects = [];
+  projectsMap = {};
+  document.getElementById('tableContent').innerHTML =
+    '<div class="loading"><div class="spinner"></div><div id="loadingText">Loading conversations...</div></div>';
+  await loadConversations();
 }
 
 // Helper function to find a claude.ai tab and send a message
@@ -1089,6 +1125,8 @@ function showToast(message, isError = false) {
 
 // Setup event listeners
 function setupEventListeners() {
+  document.getElementById('orgSelect').addEventListener('change', (e) => switchOrg(e.target.value));
+
   // Handle checkbox dependencies
   const includeChatsCheckbox = document.getElementById('includeChats');
   const includeThinkingCheckbox = document.getElementById('includeThinking');

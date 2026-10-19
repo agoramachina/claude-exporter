@@ -153,7 +153,10 @@ function getLocalDateTimeString() {
           );
           const orgId = chatOrg ? chatOrg.uuid : orgs[0].uuid;
           console.log('Auto-detected organization ID:', orgId, chatOrg ? '(chat org)' : '(fallback to first)');
-          sendResponse({ success: true, orgId });
+          // Also return every chat-capable org so the browse page can offer a switcher
+          const chatOrgs = orgs.filter(org => org.capabilities && org.capabilities.includes('chat'));
+          const orgList = (chatOrgs.length > 0 ? chatOrgs : orgs).map(org => ({ uuid: org.uuid, name: org.name || org.uuid }));
+          sendResponse({ success: true, orgId, orgs: orgList });
         } else {
           throw new Error('No organizations found');
         }
