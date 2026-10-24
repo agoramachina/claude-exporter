@@ -9,7 +9,15 @@ zip=${1:?usage: chrome-publish.sh <zip>}
 base=https://chromewebstore.googleapis.com
 item="publishers/$PUBLISHER/items/$ITEM"
 
-api() { curl -sS --fail-with-body -H "Authorization: Bearer $TOKEN" "$@"; }
+# On an HTTP error, print Google's error message before failing (it explains *why*, e.g. a 403)
+api() {
+  local out
+  if ! out=$(curl -sS --fail-with-body -H "Authorization: Bearer $TOKEN" "$@"); then
+    echo "::error::Chrome Web Store API request failed: $out" >&2
+    return 1
+  fi
+  printf '%s\n' "$out"
+}
 
 echo "Uploading $zip"
 resp=$(api -X POST -T "$zip" "$base/upload/v2/$item:upload")
