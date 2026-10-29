@@ -17,15 +17,15 @@ This file is the shared project memory. **Update it proactively** when:
 
 Keep it concise. Don't duplicate what's already here — update existing sections instead.
 
-**This file exists in two places:** the workspace root (read by Claude Code) and `src/CLAUDE.md` (tracked in git). When updating, update both copies.
+This file lives at the repo root (tracked in git).
 
 ## Project Structure
-- Extension source and git repo lives in `src/`
-- Parallel Chrome (`src/chrome/`) and Firefox (`src/firefox/`) versions — nearly identical copies
+- The workspace root is the git repo
+- Parallel Chrome (`chrome/`) and Firefox (`firefox/`) versions — nearly identical copies
 - Chrome uses Manifest V3, Firefox uses Manifest V2
 - Releases are built by GitHub Actions (see Release Process); build scripts live in `.github/scripts/`
 
-## Key Files (under `src/chrome/` and `src/firefox/`)
+## Key Files (under `chrome/` and `firefox/`)
 - `content.js` — Content script injected on claude.ai pages (handles API calls, popup export actions)
 - `utils.js` — Shared utilities (convertToMarkdown, convertToText, downloadFile, extractArtifactFiles, etc.)
 - `browse.js` — Browse page logic (filtering, sorting, has its own export functions, always ZIPs)
@@ -38,7 +38,6 @@ Keep it concise. Don't duplicate what's already here — update existing section
 
 **Auto-commit after every completed change.** Don't wait for the user to ask. After finishing a task (bug fix, feature, refactor), commit immediately with a clear message.
 
-- Git repo is in `src/` — always `cd` there for git commands
 - Write concise, descriptive commit messages: `Fix bulk export to always ZIP instead of individual downloads`
 - Not: `wip`, `fix stuff`, `update`, `final FINAL (1)`
 - Group related changes into one commit (e.g., Chrome + Firefox changes for the same fix = one commit)
@@ -57,8 +56,8 @@ Named Claudes sign their work so co-authorship is traceable to a specific instan
 
 **After each commit**, update these files:
 
-- **`src/docs/TODO.md`** — Move completed items to the Completed section, update the current version number, clean up any stale entries
-- **`src/docs/CHANGELOG.md`** — Append a short entry under the current version. Create the file if it doesn't exist. Format: `## [X.Y.Z]` header, then bullet points describing changes. Keep entries concise — one line per change is fine
+- **`docs/TODO.md`** — Move completed items to the Completed section, update the current version number, clean up any stale entries
+- **`docs/CHANGELOG.md`** — Append a short entry under the current version. Create the file if it doesn't exist. Format: `## [X.Y.Z]` header, then bullet points describing changes. Keep entries concise — one line per change is fine
 - The CHANGELOG doubles as store update notes. All changes between the current version and the last `_Published_` marker are what goes into the store listing update
 
 ## Release Process
@@ -107,11 +106,11 @@ When merging `testing` → `main` for a release, flip both manifest names to dro
 
 ## Testing
 
-- **Vitest** test harness (`package.json` + `node_modules/`) lives in `src/tests/`. Run tests with `npm test` (one-shot) or `npm run test:watch` (watch mode) from `src/tests/`.
-- Test files live in `src/tests/` and import from `src/chrome/utils.js` (the canonical copy).
+- **Vitest** test harness (`package.json` + `node_modules/`) lives in `tests/`. Run tests with `npm test` (one-shot) or `npm run test:watch` (watch mode) from `tests/`.
+- Test files live in `tests/` and import from `chrome/utils.js` (the canonical copy).
 - `firefox/utils.js` is a mirror — if it drifts from `chrome/utils.js`, the tests won't catch it. Keep them in sync per the existing rule.
 - `utils.js` has a conditional `module.exports` block at the bottom that fires only when `module` is defined (Node/vitest). Browser extensions ignore it because the global is undefined.
-- `node_modules/` and `package-lock.json` are gitignored (`package.json` is tracked under `src/tests/`). None are part of the release ZIPs.
+- `node_modules/` and `package-lock.json` are gitignored (`package.json` is tracked under `tests/`). None are part of the release ZIPs.
 
 ## Architecture Notes
 
