@@ -804,6 +804,7 @@
       </div>
 
       <div class="header-right">
+        <select id="orgSelect" class="org-select" title="Organization" style="display: none;"></select>
         <div class="stats" id="stats">
           Loading...
         </div>
@@ -935,6 +936,17 @@
     }
     .header-right .stats {
       margin: 0;
+    }
+    .org-select {
+      padding: 4px 8px;
+      margin-right: 12px;
+      max-width: 240px;
+      border: 1px solid var(--input-border);
+      border-radius: 3px;
+      font-size: 13px;
+      background-color: var(--bg-card);
+      color: var(--text-primary);
+      cursor: pointer;
     }
     .export-controls-wrapper {
       display: flex;

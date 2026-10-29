@@ -184,10 +184,16 @@ async function loadOrgId() {
   try {
     const response = await sendMessageToClaudeTab('detectOrgId', {});
     if (response && response.success && response.orgId) {
-      orgId = response.orgId;
+      const orgs = Array.isArray(response.orgs) ? response.orgs : [];
+      // Prefer the org last picked in the browse switcher if the account still has it
+      const browseOrgId = await new Promise((resolve) => {
+        chrome.storage.local.get(['browseOrgId'], (result) => resolve(result.browseOrgId));
+      });
+      orgId = orgs.some(org => org.uuid === browseOrgId) ? browseOrgId : response.orgId;
       // Save for future use / fallback
       chrome.storage.sync.set({ organizationId: orgId });
-      console.log('Auto-detected organization ID:', orgId);
+      console.log('Using organization ID:', orgId);
+      populateOrgSelect(orgs);
       return;
     }
   } catch (e) {
@@ -204,6 +210,36 @@ async function loadOrgId() {
       resolve();
     });
   });
+}
+
+// Fill the org switcher; hidden when the account has only one org
+function populateOrgSelect(orgs) {
+  const select = document.getElementById('orgSelect');
+  if (!select) return;
+  select.innerHTML = '';
+  orgs.forEach(org => {
+    const option = document.createElement('option');
+    option.value = org.uuid;
+    option.textContent = org.name;
+    option.selected = org.uuid === orgId;
+    select.appendChild(option);
+  });
+  select.style.display = orgs.length > 1 ? '' : 'none';
+}
+
+// Switch to another org and reload its conversations
+async function switchOrg(newOrgId) {
+  if (!newOrgId || newOrgId === orgId) return;
+  orgId = newOrgId;
+  chrome.storage.local.set({ browseOrgId: orgId });
+  chrome.storage.sync.set({ organizationId: orgId });
+  selectedConversations.clear();
+  allConversations = [];
+  allProjects = [];
+  projectsMap = {};
+  document.getElementById('tableContent').innerHTML =
+    '<div class="loading"><div class="spinner"></div><div id="loadingText">Loading conversations...</div></div>';
+  await loadConversations();
 }
 
 // Helper function to find a claude.ai tab and send a message
@@ -239,9 +275,12 @@ function sendMessageToClaudeTab(action, data) {
 async function loadProjects() {
   if (!orgId) return [];
 
+  const requestOrgId = orgId;
   try {
-    const response = await sendMessageToClaudeTab('loadProjects', { orgId });
+    const response = await sendMessageToClaudeTab('loadProjects', { orgId: requestOrgId });
     const projects = response.projects;
+    // The user switched orgs while this request was in flight
+    if (orgId !== requestOrgId) return [];
     console.log(`Loaded ${projects.length} projects:`, projects);
 
     // Store projects globally and build map
@@ -264,11 +303,14 @@ async function loadProjects() {
 async function loadConversations() {
   if (!orgId) return;
 
+  const requestOrgId = orgId;
   try {
     // Load projects first
     const projects = await loadProjects();
 
-    const response = await sendMessageToClaudeTab('loadConversations', { orgId });
+    const response = await sendMessageToClaudeTab('loadConversations', { orgId: requestOrgId });
+    // The user switched orgs while this request was in flight; the newer load renders instead
+    if (orgId !== requestOrgId) return;
     allConversations = response.conversations;
     console.log(`Loaded ${allConversations.length} conversations`);
 
@@ -287,6 +329,7 @@ async function loadConversations() {
     applyFiltersAndSort();
     
   } catch (error) {
+    if (orgId !== requestOrgId) return;
     console.error('Error loading conversations:', error);
     showError(`Failed to load conversations: ${error.message}`);
   }
@@ -1089,6 +1132,8 @@ function showToast(message, isError = false) {
 
 // Setup event listeners
 function setupEventListeners() {
+  document.getElementById('orgSelect').addEventListener('change', (e) => switchOrg(e.target.value));
+
   // Handle checkbox dependencies
   const includeChatsCheckbox = document.getElementById('includeChats');
   const includeThinkingCheckbox = document.getElementById('includeThinking');

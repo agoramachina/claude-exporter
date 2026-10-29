@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.10.25]
+
+- Browse page: added an organization switcher. Auto-detection always picked the first chat-capable org, so accounts in several orgs could never browse or export the others. `detectOrgId` now also returns all chat-capable orgs; the browse header shows a dropdown (hidden when there's only one org), switching reloads that org's projects and conversations, and the choice is remembered across visits.
+- Browse page: switching orgs again before the previous org finished loading no longer lets the older org's projects or conversations overwrite the newer list.
+
 ## [1.10.24]
 
 - Model snapshot records now store `conversationCreatedAt` and `conversationUpdatedAt` (from the API's `created_at` / `updated_at`), refreshed whenever the conversation list loads; existing records are backfilled on the next load. Backup exports list these two fields first in each record. Older backups still import unchanged, and new backups import into older versions (the extra fields are ignored).
