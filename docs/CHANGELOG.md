@@ -3,6 +3,7 @@
 ## [1.10.24]
 
 - Model snapshot records now store `conversationCreatedAt` and `conversationUpdatedAt` (from the API's `created_at` / `updated_at`), refreshed whenever the conversation list loads; existing records are backfilled on the next load. Backup exports list these two fields first in each record. Older backups still import unchanged, and new backups import into older versions (the extra fields are ignored).
+- Release workflow now refuses version tags that aren't on `main`, so a tag pushed from `testing` can't reach the stores. Dev tooling only; no extension code changed.
 
 ## [1.10.23]
 

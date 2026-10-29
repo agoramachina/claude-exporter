@@ -68,7 +68,7 @@ Releases are built by GitHub Actions (`.github/workflows/release.yml`), triggere
 
 1. **Verify** — both manifests show `X.Y.Z` and `docs/CHANGELOG.md` has `## [X.Y.Z]` as its top entry (the workflow fails otherwise)
 2. **Merge** — merge `testing` → `main` (flip manifest names to drop "Beta", see below)
-3. **Tag and push** — `git tag vX.Y.Z -m "Release vX.Y.Z" && git push origin main vX.Y.Z`
+3. **Tag and push** — `git tag vX.Y.Z -m "Release vX.Y.Z" && git push origin main vX.Y.Z` (tag the commit on `main` — the workflow refuses tags that aren't on `main`, so stores only ever get builds from `main`)
 4. **Workflow does the rest** — runs checks + tests, builds `claude-exporter-chrome_vX.Y.Z.zip` / `claude-exporter-firefox_vX.Y.Z.zip` (" Beta" stripped from the shipped manifests), then **submits to both stores in parallel**: Chrome Web Store via API v2 (`.github/scripts/chrome-publish.sh`, Google access via Workload Identity Federation, no stored key) and Firefox Add-ons via `web-ext sign --channel listed`. Only if both succeed does it create the GitHub release (notes = all CHANGELOG entries newer than the last `_Published_` marker). If one store job fails, fix it and use "Re-run failed jobs"
 5. **Store review happens on the stores' schedule** — both submissions go into review; nothing more to upload by hand
 6. **Mark as published** — once live in the stores, add a `_Published_` line after the released version's entries in docs/CHANGELOG.md, commit
