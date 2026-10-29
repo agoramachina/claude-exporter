@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.10.24]
+
+- Model snapshot records now store `conversationCreatedAt` and `conversationUpdatedAt` (from the API's `created_at` / `updated_at`), refreshed whenever the conversation list loads; existing records are backfilled on the next load. Backup exports list these two fields first in each record. Older backups still import unchanged, and new backups import into older versions (the extra fields are ignored).
+
 ## [1.10.23]
 
 - Browse page: Fable models get their own badge color (blue, the color they already showed in). Models from families without a dedicated color now show in crimson (`#a81f3d` light / `#f0708a` dark) instead of blue.

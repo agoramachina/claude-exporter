@@ -708,12 +708,26 @@ function getModelBadgeClass(model) {
 
 // ----- Extension data backup / restore -----
 
+// Put conversationCreatedAt / conversationUpdatedAt first in each model snapshot
+// record. Chrome storage returns object keys alphabetically, so order is fixed at
+// export time.
+function orderSnapshotKeys(snapshots) {
+  const ordered = {};
+  for (const [id, record] of Object.entries(snapshots || {})) {
+    const { conversationCreatedAt, conversationUpdatedAt, ...rest } = record || {};
+    ordered[id] = { conversationCreatedAt, conversationUpdatedAt, ...rest };
+  }
+  return ordered;
+}
+
 // Download all extension storage (local + sync) as a structured JSON file.
 // onComplete(success, message) reports the result so each caller can show it
 // its own way (options page status line vs. browse-page toast).
 function backupExtensionData(onComplete) {
   chrome.storage.local.get(null, (local) => {
     chrome.storage.sync.get(null, (sync) => {
+      const localData = { ...(local || {}) };
+      if (localData.modelSnapshots) localData.modelSnapshots = orderSnapshotKeys(localData.modelSnapshots);
       const backup = {
         _meta: {
           app: 'claude-exporter',
@@ -721,7 +735,7 @@ function backupExtensionData(onComplete) {
           extensionVersion: chrome.runtime.getManifest().version,
           createdAt: new Date().toISOString()
         },
-        local: local || {},
+        local: localData,
         sync: sync || {}
       };
       const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
@@ -1086,6 +1100,7 @@ if (typeof module !== 'undefined' && module.exports) {
     formatModelName,
     getModelBadgeClass,
     backupExtensionData,
+    orderSnapshotKeys,
     importBackup,
     mergeStorageData,
     sanitizeForDiagnostics,

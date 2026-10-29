@@ -46,6 +46,16 @@
 
 ### Medium Priority 🟡
 
+- **Backup format v2: descriptive model snapshot field names**
+  - Rename `current` → `currentModel`, `currentAt` → `currentModelSeenAt`, `firstSeen` → `originalModel`, `firstSeenAt` → `originalModelSeenAt` (date pair already renamed to `conversationCreatedAt` / `conversationUpdatedAt` in v1.10.24)
+  - Needs: one-time migration of stored `modelSnapshots`, import accepting both old and new names, `backupVersion: 2`, browse.js `getDisplayModel` reading new names, tests
+  - Downside to note: v2 backups imported into older versions lose model-bounce data (they only read `current` / `firstSeen`)
+
+- **Rewrite the light-mode color theme**
+  - Current light palette is weak; user can't easily test light mode themselves, so verify with screenshots
+  - Likely needs more classes/ids in browse.html / popup.html / options so elements can be styled individually
+  - Badge colors live in `--badge-*` vars across three theme blocks in browse.html
+
 - **Verify automated store uploads on the first real tagged release**
   - The release workflow now submits to the Chrome Web Store and AMO, but the store jobs have only been tested against stubbed responses
   - Watch the first tag's run; if a store job fails, fix it and use "Re-run failed jobs"
@@ -154,6 +164,8 @@
 (none currently open)
 
 ## Completed ✅
+
+- **conversationCreatedAt / conversationUpdatedAt in model snapshot records + backups** (v1.10.24)
 
 - **Fable badge color; crimson default badge** (v1.10.23)
 

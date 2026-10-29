@@ -14,6 +14,7 @@ const {
   DEFAULT_MODEL_TIMELINE,
   sanitizeFilename,
   uniqueFilename,
+  orderSnapshotKeys,
 } = utils;
 
 // Regression coverage for the bug fixed in v1.9.1: bash/web_search/repl
@@ -617,5 +618,35 @@ describe('uniqueFilename', () => {
     uniqueFilename('Chat', '', used);
     uniqueFilename('Chat', '', used); // -> "Chat (2)"
     expect(uniqueFilename('Chat (2)', '', used)).toBe('Chat (2) (2)');
+  });
+});
+
+describe('orderSnapshotKeys', () => {
+  it('puts conversationCreatedAt and conversationUpdatedAt before the stored (alphabetical) keys', () => {
+    const stored = {
+      abc: {
+        current: 'claude-sonnet-4-5-20250929',
+        currentAt: '2026-10-17T09:29:06.978Z',
+        firstSeen: 'claude-sonnet-4-5-20250929',
+        firstSeenAt: '2026-10-17T09:29:06.978Z',
+        history: [],
+        conversationUpdatedAt: '2026-10-20T00:00:00Z',
+        conversationCreatedAt: '2026-10-01T00:00:00Z',
+      },
+    };
+    expect(Object.keys(orderSnapshotKeys(stored).abc)).toEqual([
+      'conversationCreatedAt', 'conversationUpdatedAt', 'current', 'currentAt', 'firstSeen', 'firstSeenAt', 'history',
+    ]);
+  });
+
+  it('leaves old records without dates intact once serialized', () => {
+    const old = { abc: { current: 'claude-opus-4-7', firstSeen: 'claude-opus-4-7' } };
+    const roundTripped = JSON.parse(JSON.stringify(orderSnapshotKeys(old)));
+    expect(roundTripped).toEqual(old);
+  });
+
+  it('handles empty or missing input', () => {
+    expect(orderSnapshotKeys({})).toEqual({});
+    expect(orderSnapshotKeys(undefined)).toEqual({});
   });
 });

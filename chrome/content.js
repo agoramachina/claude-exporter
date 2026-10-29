@@ -34,6 +34,7 @@ function recordExportTimestamps(conversationIds) {
 // Snapshot each conversation's current model so it survives a model bounce
 // (e.g. when a model retires and Claude silently moves old chats onto a new
 // one). Only the raw API model is recorded — never an inferred guess.
+// Also keeps conversationCreatedAt / conversationUpdatedAt in sync with the API.
 function recordModelSnapshots(conversations) {
   if (!Array.isArray(conversations)) return;
   chrome.storage.local.get(['modelSnapshots'], (result) => {
@@ -47,6 +48,8 @@ function recordModelSnapshots(conversations) {
       const existing = snapshots[id];
       if (!existing) {
         snapshots[id] = {
+          conversationCreatedAt: conv.created_at,
+          conversationUpdatedAt: conv.updated_at,
           firstSeen: model,
           firstSeenAt: now,
           current: model,
@@ -59,6 +62,14 @@ function recordModelSnapshots(conversations) {
         existing.currentAt = now;
         existing.history = existing.history || [];
         existing.history.push({ model, at: now });
+        changed = true;
+      }
+      if (existing && conv.created_at && existing.conversationCreatedAt !== conv.created_at) {
+        existing.conversationCreatedAt = conv.created_at;
+        changed = true;
+      }
+      if (existing && conv.updated_at && existing.conversationUpdatedAt !== conv.updated_at) {
+        existing.conversationUpdatedAt = conv.updated_at;
         changed = true;
       }
     }
