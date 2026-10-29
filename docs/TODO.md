@@ -6,16 +6,10 @@
 
 ### High Priority 🟠
 
-- **Prepare for new model families (e.g. Mythos)**
-  - Source of truth: [Anthropic model IDs and versions docs](https://platform.claude.com/docs/en/about-claude/models/model-ids-and-versions)
-  - Current `formatModelName` regex in [chrome/utils.js](../chrome/utils.js) hardcodes family ∈ `{sonnet, opus, haiku}` — anything else (e.g. expected `claude-mythos-preview`) falls through to raw-ID display and gets no badge color
-  - Test coverage now pins this behavior — [tests/utils.test.js](../tests/utils.test.js) "unknown family fallthrough" suite will fail loudly the day Anthropic ships a new family, prompting a regex bump + new badge CSS class
-  - When a new family lands, the change is small:
-    1. Add family to the `(sonnet|opus|haiku)` regex group in `formatModelName`
-    2. Add an `if (model.includes('mythos'))` branch in `getModelBadgeClass`
-    3. Add `.mythos` CSS class with brand color in popup.html, browse.html, content.css
-    4. Add timeline entry to `DEFAULT_MODEL_TIMELINE` once it becomes the default on claude.ai
-  - Note: `-preview` suffix breaks the version-segment regex (expects `\d{1,2}`); needs special-casing or a broader regex if Anthropic stabilizes that naming
+- **Badge colors + timeline for new model families (Fable, future ones)**
+  - Name formatting is family-agnostic since v1.10.22; badges are not — `getModelBadgeClass` only knows sonnet/opus/haiku, so Fable etc. render in `--badge-default`
+  - Per family: add a branch in `getModelBadgeClass`, a CSS class + color var in popup.html, browse.html, content.css; add `DEFAULT_MODEL_TIMELINE` entries once it's the claude.ai default
+  - Note: `-preview`-style IDs (non-numeric version) still display raw; special-case if Anthropic ships one on claude.ai
   - Bedrock/Vertex prefixes intentionally out of scope — claude.ai never serves those
 
 - **`DEFAULT_MODEL_TIMELINE` maintenance**
@@ -160,6 +154,9 @@
 (none currently open)
 
 ## Completed ✅
+
+- **Family-agnostic model name formatting** (v1.10.22)
+  - `formatModelName` matches any family by ID shape, so `claude-fable-5-1` → "Claude Fable 5.1"; future families need no code change
 
 - **Automated store uploads in the release workflow** (v1.10.21)
   - Tag push: build → Chrome Web Store (API v2, Workload Identity Federation, no stored key) + AMO (`web-ext sign`, listed) in parallel → GitHub release only if both succeed

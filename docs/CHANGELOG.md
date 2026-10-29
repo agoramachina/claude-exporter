@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.10.22]
+
+- Fixed model names for newer families (e.g. Fable) showing as raw IDs like `claude-fable-5` on the browse page; they now display as "Claude Fable 5". The formatter now matches any family name by ID shape instead of a fixed sonnet/opus/haiku list, so future families format correctly without an update.
+
 ## [1.10.21]
 
 - Fixed bulk ZIP exports silently dropping conversations that share a title (e.g. several "New chat"s). `zip.file()` replaces same-named entries, so only the last one survived; in nested-artifact mode, same-titled conversations were merged into one folder and their artifacts could overwrite each other. Duplicates are now suffixed `" (2)"`, `" (3)"`, … via new `uniqueFilename()` (case-insensitive, since Windows/macOS filesystems are). Applies to popup Export All and browse-page Export Selected/All.
