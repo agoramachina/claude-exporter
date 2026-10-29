@@ -275,9 +275,12 @@ function sendMessageToClaudeTab(action, data) {
 async function loadProjects() {
   if (!orgId) return [];
 
+  const requestOrgId = orgId;
   try {
-    const response = await sendMessageToClaudeTab('loadProjects', { orgId });
+    const response = await sendMessageToClaudeTab('loadProjects', { orgId: requestOrgId });
     const projects = response.projects;
+    // The user switched orgs while this request was in flight
+    if (orgId !== requestOrgId) return [];
     console.log(`Loaded ${projects.length} projects:`, projects);
 
     // Store projects globally and build map
@@ -300,11 +303,14 @@ async function loadProjects() {
 async function loadConversations() {
   if (!orgId) return;
 
+  const requestOrgId = orgId;
   try {
     // Load projects first
     const projects = await loadProjects();
 
-    const response = await sendMessageToClaudeTab('loadConversations', { orgId });
+    const response = await sendMessageToClaudeTab('loadConversations', { orgId: requestOrgId });
+    // The user switched orgs while this request was in flight; the newer load renders instead
+    if (orgId !== requestOrgId) return;
     allConversations = response.conversations;
     console.log(`Loaded ${allConversations.length} conversations`);
 
@@ -323,6 +329,7 @@ async function loadConversations() {
     applyFiltersAndSort();
     
   } catch (error) {
+    if (orgId !== requestOrgId) return;
     console.error('Error loading conversations:', error);
     showError(`Failed to load conversations: ${error.message}`);
   }
