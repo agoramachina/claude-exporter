@@ -28,7 +28,8 @@
       --progress-bg: #e0e0e0;
       --cancel-btn: #dc3545;
       --link-hover: #5d44e8;
-      --badge-default: #1d4ed8;
+      --badge-default: #a81f3d;
+      --badge-fable: #1d4ed8;
       --badge-sonnet: #ce5c04;
       --badge-haiku: #09923b;
       --badge-opus: #7c3aed;
@@ -59,7 +60,8 @@
         --progress-bg: #3a3a3a;
         --cancel-btn: #e74c3c;
         --link-hover: #8b7aff;
-        --badge-default: #7ab8f5;
+        --badge-default: #f0708a;
+        --badge-fable: #7ab8f5;
         --badge-sonnet: #ffaa66;
         --badge-haiku: #66cc66;
         --badge-opus: #c084cc;
@@ -90,7 +92,8 @@
       --progress-bg: #3a3a3a;
       --cancel-btn: #e74c3c;
       --link-hover: #8b7aff;
-      --badge-default: #7ab8f5;
+      --badge-default: #f0708a;
+      --badge-fable: #7ab8f5;
       --badge-sonnet: #ffaa66;
       --badge-haiku: #66cc66;
       --badge-opus: #c084cc;
@@ -585,6 +588,10 @@
       color: var(--badge-opus);
     }
 
+    .model-badge.fable {
+      color: var(--badge-fable);
+    }
+
     .model-bounced {
       margin-left: 4px;
       font-size: 12px;
@@ -594,6 +601,7 @@
     .model-bounced.sonnet { color: var(--badge-sonnet); }
     .model-bounced.haiku  { color: var(--badge-haiku); }
     .model-bounced.opus   { color: var(--badge-opus); }
+    .model-bounced.fable  { color: var(--badge-fable); }
 
     /* Wrapper that carries the tooltip + cursor so hover works on the badge or asterisk */
     .model-cell {

@@ -496,6 +496,7 @@ describe('getModelBadgeClass', () => {
     expect(getModelBadgeClass('claude-sonnet-4-5-20250929')).toBe('sonnet');
     expect(getModelBadgeClass('claude-opus-4-7')).toBe('opus');
     expect(getModelBadgeClass('claude-haiku-3-5')).toBe('haiku');
+    expect(getModelBadgeClass('claude-fable-5-1')).toBe('fable');
   });
 
   it('returns empty string for unknown family', () => {

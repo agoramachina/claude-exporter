@@ -6,9 +6,9 @@
 
 ### High Priority 🟠
 
-- **Badge colors + timeline for new model families (Fable, future ones)**
-  - Name formatting is family-agnostic since v1.10.22; badges are not — `getModelBadgeClass` only knows sonnet/opus/haiku, so Fable etc. render in `--badge-default`
-  - Per family: add a branch in `getModelBadgeClass`, a CSS class + color var in popup.html, browse.html, content.css; add `DEFAULT_MODEL_TIMELINE` entries once it's the claude.ai default
+- **Badge colors + timeline for new model families**
+  - Name formatting is family-agnostic since v1.10.22; badges are not — families without a dedicated class render in `--badge-default` (crimson since v1.10.23)
+  - Per family: add a branch in `getModelBadgeClass`, a `--badge-<family>` var in all three theme blocks + `.model-badge.<family>` / `.model-bounced.<family>` in browse.html; add `DEFAULT_MODEL_TIMELINE` entries once it's the claude.ai default
   - Note: `-preview`-style IDs (non-numeric version) still display raw; special-case if Anthropic ships one on claude.ai
   - Bedrock/Vertex prefixes intentionally out of scope — claude.ai never serves those
 
@@ -154,6 +154,8 @@
 (none currently open)
 
 ## Completed ✅
+
+- **Fable badge color; crimson default badge** (v1.10.23)
 
 - **Family-agnostic model name formatting** (v1.10.22)
   - `formatModelName` matches any family by ID shape, so `claude-fable-5-1` → "Claude Fable 5.1"; future families need no code change

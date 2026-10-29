@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.10.23]
+
+- Browse page: Fable models get their own badge color (blue, the color they already showed in). Models from families without a dedicated color now show in crimson (`#a81f3d` light / `#f0708a` dark) instead of blue.
+
 ## [1.10.22]
 
 - Fixed model names for newer families (e.g. Fable) showing as raw IDs like `claude-fable-5` on the browse page; they now display as "Claude Fable 5". The formatter now matches any family name by ID shape instead of a fixed sonnet/opus/haiku list, so future families format correctly without an update.
