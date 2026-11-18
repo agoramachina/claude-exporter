@@ -477,7 +477,39 @@
       align-items: center;
       gap: 8px;
       flex-grow: 1;
-      max-width: 540px;
+      max-width: 720px;
+    }
+
+    .project-filter-group select {
+      padding: 9px 12px;
+      border: 1px solid var(--input-border);
+      border-radius: 20px;
+      font-size: 13px;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      cursor: pointer;
+      max-width: 170px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      transition: border-color 0.2s;
+    }
+
+    .project-filter-group select:focus {
+      outline: none;
+      border-color: var(--input-focus);
+    }
+
+    .project-link {
+      color: var(--text-primary);
+      text-decoration: none;
+      cursor: pointer;
+      border-bottom: 1px dotted var(--text-muted);
+      transition: color 0.15s, border-bottom-color 0.15s;
+    }
+
+    .project-link:hover {
+      color: var(--primary-color);
+      border-bottom-color: var(--primary-color);
     }
 
     .search-group .search-box {
@@ -830,6 +862,11 @@
             <div class="filter-option" data-value="projects">Search projects</div>
           </div>
         </div>
+        <div class="filter-group project-filter-group">
+          <select id="projectFilter" title="Filter conversations by project">
+            <option value="">All Projects</option>
+          </select>
+        </div>
       </div>
 
       <div class="export-controls-wrapper">
@@ -858,6 +895,11 @@
               <label title="Add conversation metadata (name, date, model, etc.) at the top of exported files">
                 <input type="checkbox" id="includeMetadata">
                 Metadata
+              </label>
+
+              <label title="Organize exported chats into subfolders by Claude Project inside the ZIP">
+                <input type="checkbox" id="groupByProject">
+                Projects
               </label>
             </div>
 

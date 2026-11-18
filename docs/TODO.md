@@ -103,7 +103,7 @@
 
 - **Robust filter**
   - Filter by project, model, artifact
-  - Project search SHIPPED (v1.10.1) — "Search projects" option in the funnel dropdown scopes the search bar to project names. Model + artifact filtering still pending.
+  - Project filter & export SHIPPED (v1.10.25) — dedicated Project dropdown in browse controls, clickable project links in table, and "Projects" ZIP folder organization option for bulk export. "Search projects" option in the funnel dropdown scopes search bar to project names (v1.10.1). Model + artifact filtering still pending.
 
 - **Advanced settings menu**
   - Verbosity toggle & Debug log
@@ -164,6 +164,11 @@
 (none currently open)
 
 ## Completed ✅
+
+- **Project folders ZIP export and project filter in browse page** (v1.10.25)
+  - Added "Projects" checkbox in export settings to organize ZIP exports into subfolders by project
+  - Added Project filter dropdown in browse toolbar and clickable project links in table
+  - Single-project bulk exports tag project name in download filename
 
 - **conversationCreatedAt / conversationUpdatedAt in model snapshot records + backups** (v1.10.24)
 

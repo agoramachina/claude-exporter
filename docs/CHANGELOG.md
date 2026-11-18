@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.25]
+
+- Browse page: added "Projects" checkbox in export settings. When enabled, bulk and selected ZIP exports organize conversations into subfolders named after their Claude project (with a `No Project` folder for standalone chats). Works seamlessly with both flat and nested artifact export modes.
+- Browse page: added a dedicated Project filter dropdown populated dynamically with all loaded projects (plus "All Projects" and "No Project"). Selecting a project filters the table to all conversations under that project.
+- Browse page: project names in the table are now clickable links that instantly filter the view to that project.
+- Bulk export ZIP files now tag the project name in the downloaded archive filename when exporting a single project (e.g. `claude-exports-<ProjectName>-<datetime>.zip`).
+
 ## [1.10.24]
 
 - Model snapshot records now store `conversationCreatedAt` and `conversationUpdatedAt` (from the API's `created_at` / `updated_at`), refreshed whenever the conversation list loads; existing records are backfilled on the next load. Backup exports list these two fields first in each record. Older backups still import unchanged, and new backups import into older versions (the extra fields are ignored).
